@@ -1,0 +1,2410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group
+	xmlns:fx="http://ns.adobe.com/mxml/2009"
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	xmlns:esri="http://www.esri.com/2008/ags" 
+	xmlns:EncComponents="EncComponents.*"
+	creationComplete="init()" width="{parentApplication.width}" height="100%">
+	<s:layout> 
+		<s:BasicLayout />  
+	</s:layout>
+
+
+
+
+	<fx:Script>
+		<![CDATA[
+			import EncComponents.SuperPanel;
+			
+			import com.esri.ags.FeatureSet;
+			import com.esri.ags.Graphic;
+			import com.esri.ags.SpatialReference;
+			import com.esri.ags.events.ExtentEvent;
+			import com.esri.ags.events.GeometryServiceEvent;
+			import com.esri.ags.events.LayerEvent;
+			import com.esri.ags.events.MapEvent;
+			import com.esri.ags.events.MapMouseEvent;
+			import com.esri.ags.events.QueryEvent;
+			import com.esri.ags.geometry.Extent;
+			import com.esri.ags.geometry.Geometry;
+			import com.esri.ags.geometry.MapPoint;
+			import com.esri.ags.geometry.Polygon;
+			import com.esri.ags.layers.GraphicsLayer;
+			import com.esri.ags.layers.Layer;
+			import com.esri.ags.layers.supportClasses.AllDetails;
+			import com.esri.ags.layers.supportClasses.LayerDetails;
+			import com.esri.ags.layers.supportClasses.LayerInfo;
+			import com.esri.ags.layers.supportClasses.Relationship;
+			import com.esri.ags.tasks.supportClasses.AddressCandidate;
+			import com.esri.ags.tasks.supportClasses.BufferParameters;
+			import com.esri.ags.tasks.supportClasses.IdentifyParameters;
+			import com.esri.ags.tasks.supportClasses.IdentifyResult;
+			import com.esri.ags.utils.WebMercatorUtil;
+			
+			import events.SlidingPanelEvent;
+			
+			import flash.filters.BitmapFilterQuality;
+			import flash.filters.BitmapFilterType;
+			import flash.net.SharedObject;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.HierarchicalCollectionViewCursor;
+			import mx.collections.IViewCursor;
+			import mx.collections.ListCollectionView;
+			import mx.collections.Sort;
+			import mx.collections.SortField;
+			import mx.controls.Alert;
+			import mx.controls.Button;
+			import mx.controls.ButtonBar;
+			import mx.controls.ToggleButtonBar;
+			import mx.controls.advancedDataGridClasses.AdvancedDataGridItemRenderer;
+			import mx.controls.tabBarClasses.Tab;
+			import mx.core.UIComponent;
+			import mx.effects.*;
+			import mx.events.EffectEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.events.ItemClickEvent;
+			import mx.events.StateChangeEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.AsyncResponder;
+			import mx.rpc.AsyncToken;
+			import mx.rpc.Fault;
+			import mx.rpc.events.FaultEvent;
+			import mx.utils.ObjectUtil;
+			
+			import skins.IconButtonSkin;
+			import skins.IconButtonZoomPrevious;
+			
+			import spark.components.Application;
+			import spark.effects.animation.*;
+			import spark.events.IndexChangeEvent;
+			import spark.filters.GlowFilter;
+			
+			[Bindable]
+			private var aLayersTOC:ArrayCollection = new ArrayCollection;
+			
+			[Bindable]
+			private var fabricAttributes:ArrayCollection = new ArrayCollection;
+		
+			[Bindable]
+			private var imageLayer:Layer;
+			
+			[Bindable]
+			private var reliefLayer:Layer;
+			
+			[Bindable]
+			private var basemapLayer:Layer;
+		
+			[Bindable]
+			private var basemapPlusLayer:Layer;
+					
+			[Bindable]
+			private var Result1:ArrayCollection = new ArrayCollection;
+					
+			[Bindable]
+			private var Result2:ArrayCollection = new ArrayCollection;
+			
+			[Bindable]
+			private var Result3:ArrayCollection = new ArrayCollection;
+					
+			[Bindable]
+			private var arrayAddresses:ArrayCollection	= new ArrayCollection;
+			[Bindable]
+			private var arrayPermits:ArrayCollection	= new ArrayCollection;
+			
+			[Bindable]
+			private var arraySubdivResult:ArrayCollection	= new ArrayCollection;
+			[Bindable]
+			private var arrcSubdiv:ArrayCollection	= new ArrayCollection;
+			[Bindable]
+			private var arrcSewerEDU:ArrayCollection	= new ArrayCollection;
+			[Bindable]
+			private var arrcSewerPermits:ArrayCollection	= new ArrayCollection;
+			
+			[Bindable]
+			private var acGradingPermits:ArrayCollection = new ArrayCollection;
+			
+//Group of variable to hold values that results panel items will bind too
+			[Bindable]
+			private var txtPlanName:String;
+			[Bindable]
+			private var txtCompany:String;
+			[Bindable]
+			private var txtLglDate:String;
+			[Bindable]
+			private var txtPCntyRecording:String;
+			[Bindable]
+			private var txtPDescription:String;
+			[Bindable]
+			private var txtPResDevel:String;
+			[Bindable]
+			private var acHistoricParcels:ArrayCollection = new ArrayCollection;
+			[Bindable]
+			private var txtSurveyDate:String;
+			[Bindable]
+			private var txtSurveyor:String;
+			[Bindable]
+			private var acEDUs:ArrayCollection = new ArrayCollection;
+			[Bindable]
+			private var acBMPPermits:ArrayCollection = new ArrayCollection;
+			
+			[Bindable]
+			private var txtSewerDist:String;
+			[Bindable]
+			private var txtSewerReimbursement:String = "NA";
+			[Bindable]
+			private var txtFirePrePlan:String = "NA";
+			[Bindable]
+			private var txtFireGrid:String;
+			[Bindable]
+			private var txtFireHH:String = "No";
+			[Bindable]
+			private var txtSheriffKnox:String = "No";
+			[Bindable]
+			private var txtEvacArea:String;		
+			[Bindable]
+			private var arr3MinZone:ArrayCollection = new ArrayCollection;
+			[Bindable]
+			private var txtWaterDist:String;
+			[Bindable]
+			private var arrWaterMeters:ArrayCollection = new ArrayCollection;
+			[Bindable]
+			private var txtWaterCycle:String;
+			[Bindable]
+			private var txtWaterRecycled:String;
+			[Bindable]
+			private var acParcelResults:ArrayCollection = new ArrayCollection;
+			[Bindable]
+			private var arrcBMPs:ArrayCollection = new ArrayCollection;
+			[Bindable]
+			private var strPermitProritu:String;
+			[Bindable]
+			private var txtSpecificZone:String;
+			[Bindable]
+			private var txtGPZone:String;
+			[Bindable]
+			private var txtBaseZoning:String;
+			[Bindable]
+			private var myParcelCursor:IViewCursor;
+			
+			[Bindable]
+			private var arrcAddressRelatedToPoints:ArrayCollection = new ArrayCollection;
+			
+			[Bindable]
+			private var currentPoint:MapPoint;
+			
+			private var arrcPlans:Array = new Array;
+	private var  URLparams:Object = getURLParameters();
+	private var APN:String;
+	private var blnInitCount:Boolean = false;
+	private var frLat:String;
+	private var frLong:String;
+	private var indAddressPoint:int;
+	private var indParcel:int;
+	private	var AllDetailresults:AllDetails;
+			private var animating:Boolean = false;
+			[Bindable]
+			private var mpIDPoint:MapPoint;
+			private var strBMPFacilityID:String;
+			
+	private function init():void
+	{
+
+		//this.setChildIndex(cnvMap, 0);
+		this.setElementIndex(appMain, 1);
+		this.setElementIndex(mapcontrol1, 2);
+		//this.setChildIndex(Toc1, 3);
+		aLayersTOC.removeAll();
+		
+		reliefLayer = map.layers[0];
+		imageLayer = map.layers[1];
+		
+		basemapLayer = map.layers[2];
+		basemapPlusLayer = map.layers[3]; 
+		
+
+		aLayersTOC.addItem(map.layers[2]);
+		aLayersTOC.addItem(map.layers[3]);
+		
+		var i:int;
+		Result1.addItem({Address: "", FacilityID: ""});
+		Result2.removeAll()
+		//Result3.addItem({BusinessName: "", BusinessPhone: ""});
+		
+		if (URLparams ["start"])
+		{
+			
+			if (URLparams ["start"].toString() == "geocode")
+			{
+				
+				
+				var addr:String=(URLparams ["search"].toString());
+				if (URLparams ["srchType"])
+				{
+					var srchtype:String=(URLparams ["srchType"].toString());
+					if (srchtype == "1")
+					{
+						doSearchAPN(addr)
+					}
+					else
+					{
+						doSearchAddress(addr)
+					}
+				}
+			}
+			else if (URLparams ["start"].toString() == "extent")
+			{
+				var extent:Extent = new Extent(URLparams ['xmin'].toString(),URLparams ['ymin'].toString(),URLparams ['xmax'].toString(),URLparams ['ymax'].toString())
+				map.extent = extent
+			
+			}
+			
+		}
+		else
+		{
+			//Alert.show("Type in an address or APN in the 'Find' box to zoom to that location and get basic information about that site.", "Welcome to Finder")
+			var local_data:SharedObject = SharedObject.getLocal ("user_data");
+			if (local_data.size == 0)
+			{
+				var screen:EncComponents.splashScreen = new splashScreen;
+				PopUpManager.addPopUp( screen, this,true);
+				PopUpManager.centerPopUp(screen)
+			}
+		}
+		if (URLparams ['X'])
+		{
+			var mapPoint:MapPoint = new MapPoint(URLparams ['X'].toString(),URLparams ['Y'].toString())
+			var mapEvent:MapMouseEvent = new MapMouseEvent("mapClick", map, mapPoint)
+			onMapClicked(mapEvent)
+		}
+	}
+
+		
+
+	private function navitemClickHandler(event:IndexChangeEvent):void
+	{
+ 		switch (event.target.dataProvider[event.newIndex].data)
+		{                    
+			case "Zoom In":                    
+			{                        
+				navToolbar.activate(NavigationTool.ZOOM_IN);                       
+				break;                    
+			}                    
+			case "Zoom Out":                    
+			{                        
+				navToolbar.activate(NavigationTool.ZOOM_OUT);                        
+				break;                    
+			}                    
+			case "Identify":
+			{
+				navToolbar.deactivate();
+				//map.addEventListener(MapMouseEvent.MAP_CLICK,onMapClicked);
+				map.panEnabled=true;
+				map.openHandCursorVisible=false;
+				//tbb.selectedIndex = -1
+				break;
+			}                
+		}             
+	}
+	
+
+	
+	private function onMapClicked(event:MapMouseEvent):void
+	{
+		if (tbb.selectedIndex > 1)
+		{
+			switch ( tbb.selectedItem.data)
+			{
+				case "Identify":
+				{
+					//lblAddreesCount.text = "";
+					//lblBusinessCount.text = "";
+					currentPoint = event.mapPoint
+					clearSelected();
+					mpIDPoint = event.mapPoint
+					doQuery(event.mapPoint);
+					break;
+				}
+				case "StreetView":
+				{
+					const frmapPoint:MapPoint = map.toMapFromStage(event.stageX, event.stageY);
+					var latlong:MapPoint;
+					var wkidString:String = frmapPoint.spatialReference.wkid.toString();
+					
+					if ( wkidString == "102100")
+					{
+						latlong = WebMercatorUtil.webMercatorToGeographic(frmapPoint) as MapPoint;
+						frLat = latlong.y.toFixed(6);
+						frLong = latlong.x.toFixed(6);
+						displayForm(frLat, frLong);
+					}
+					else if ( wkidString == "3857")
+					{
+						latlong = WebMercatorUtil.webMercatorToGeographic(frmapPoint) as MapPoint;
+						frLat = latlong.y.toFixed(6);
+						frLong = latlong.x.toFixed(6);
+						displayForm(frLat, frLong);
+					}
+					else if ( wkidString == "4326")
+					{
+						latlong = map.toMapFromStage(event.stageX, event.stageY);
+						frLat = latlong.y.toFixed(6);
+						frLong = latlong.x.toFixed(6);
+						displayForm(frLat, frLong);
+					}
+					
+					var graphic:Graphic = new Graphic();	
+					var mapPoint2:MapPoint = frmapPoint;
+					mapPoint2.spatialReference = map.spatialReference;				
+					graphic.geometry = mapPoint2;				
+					graphicsLayer.clear();				
+					graphicsLayer.add(graphic);
+				}
+				default:
+				{
+					break;
+				}
+			}
+
+		}
+
+	}
+			
+	public function displayForm(lat:String,long:String):void
+	{
+		var myURL:String;
+		myURL = "http://data.mapchannels.com/mm/dual2/map.htm?x=" + long + "&y=" + lat + "&z=16&gm=0&ve=3&gc=0&xb=" + long + "&yb=" + lat + "&zb=1&db=0&bar=0&mw=1&sv=1&svb=0&mi=0&mg=1&mv=1%20marginwidth='0'%20marginheight='0'%20frameborder='0'%20scrolling='no'";
+		var pop1:WebForm = WebForm(
+		PopUpManager.createPopUp(this, WebForm, true));
+		pop1.title = myURL;
+		pop1.showCloseButton=true;
+		PopUpManager.centerPopUp(pop1);
+	}
+	
+	//get the parcel where the user just clicked by querying the parcel layer
+	private function doQuery(queryPoint:MapPoint):void
+	{
+		queryParcelParams.geometry= queryPoint;
+		queryParcels.execute(queryParcelParams);
+	}
+			
+			//Sub that does the actual identify against the siteprofiler map service using the geometry
+			//of the currently selected parcel
+			//When the parcel clicked has been identifieduse it as the basis for the
+			//identify operation on the siteprofiler map service
+			private function onQueryParcelComplete(event:QueryEvent):void
+			{
+		        var fset:FeatureSet = event.featureSet; 
+				var VOArray:Array = new Array;
+				var arParcelIDs:Array = new Array;
+				if (fset.features.length >0)
+				{
+					var buffParam:BufferParameters = new BufferParameters;
+					buffParam.distances=[-3];
+					buffParam.unit=GeometryService.UNIT_FOOT;
+					buffParam.geometries=[fset.features[0].geometry];
+					geometry1.addEventListener(GeometryServiceEvent.BUFFER_COMPLETE, bufferCompleteHandler);
+					geometry1.buffer(buffParam);
+					function bufferCompleteHandler(event:GeometryServiceEvent):void
+					{
+						geometry1.removeEventListener(GeometryServiceEvent.BUFFER_COMPLETE, bufferCompleteHandler);
+						// Note: As of version 2.0, GeometryService returns geometries (instead of graphics)
+						for each (var geometry:Polygon in event.result)
+						{
+							
+							var identifyParams:IdentifyParameters = new IdentifyParameters();
+							identifyParams.returnGeometry=true;
+							identifyParams.width=map.width;
+							identifyParams.height=map.height;
+							identifyParams.geometry=geometry
+							//identifyParams.geometry= graphic.geometry;
+							identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_ALL
+							//identifyParams.layerIds = [0,1,2,3];	
+							identifyParams.mapExtent= map.extent;
+							identifyParams.spatialReference= map.spatialReference;
+							identifyParams.tolerance=3;
+							SiteProfiler_Identify.execute(identifyParams, new AsyncResponder(onSiteProfileResult, onZoningFault,graphic)); 
+							
+						}
+					}
+
+					
+					//in case there are stacked parcels look through the returned dataset and add the stacked parcels
+					//to an array and also a special user type to allow us easily access attributes
+					//from a view cursor
+					for each (var graphic:Graphic in fset.features)                
+					{
+						graphic.symbol = fillSymbol
+						graphic.visible = true
+						
+						if (lblAPN)
+						{
+							lblAPN.text = graphic.attributes['gispub.GIS.survey_TaxParcelFabric.APN']
+						}
+		
+						//dgZoning.dataProvider = graphic.attributes
+						var obj:Object = graphic.attributes;
+						var i:int
+						arrcAddressRelatedToPoints.addItem(graphic.attributes["gispub.GIS.hdl_TaxRec.SitusStreet"]);
+
+						//Also store the parcels returned in an user defined data type to store its attritbutes in an esiily accessabe'
+						//way
+						var VO:ParcelVO = new ParcelVO;
+						for ( var fld:String in obj )
+						{
+		 					i = fld.lastIndexOf(".") + 1
+							switch (fld.substr(i))
+							{
+								case "APN":
+								{
+									VO.APN=obj[fld]
+									break;
+								}
+									
+								case "OwnerName1":
+								{
+									VO.OwnerName1=obj[fld]
+									break;
+								}
+								case "OwnerName2":
+								{
+									VO.OwnerName2=obj[fld]
+									break;
+								}
+									
+								case "MailToName":
+								{
+									VO.MailToName=obj[fld]
+									break;
+								}
+								case "MailStreet":
+								{
+									VO.MailStreet=obj[fld]
+									break;
+								}
+								case "MailCity":
+								{
+									VO.MailCity=obj[fld]
+									break;
+								}
+								case "MailZip":
+								{
+									VO.MailZip=obj[fld]
+									break;
+								}
+								case "MailState":
+								{
+									VO.MailState=obj[fld]
+									break;
+								}
+								case "MailCountry":
+								{
+									VO.MailCountry=obj[fld];
+									break;
+								}
+								case "AbsenteeFlag":
+								{
+									if (obj[fld] == "Yes")
+									{
+										VO.AbsenteeFlag="No"
+									}
+									else if (obj[fld] == "No")
+									{
+										VO.AbsenteeFlag="Yes"
+									}
+		
+									break;
+								} 
+								case "ParcelID":
+								{
+									arParcelIDs.push(obj[fld]);
+									break;
+								}
+								case "SitusStreet":
+								{
+									lblSelectedAddress.text = "Selected Parcel : " + obj[fld];
+									break;
+								}
+							}
+						}
+						acParcelResults.addItem(VO);
+						VOArray.push(VO);
+		
+
+					}
+					if (!spMain.IsOpen)
+					{
+						spMain.open()
+					}
+				}
+				//create a cursor so we can page through the returned parcels in a form
+				myParcelCursor = acParcelResults.createCursor();
+		 		var sort:Sort = new Sort();
+				sort.fields = [new SortField("APN")];
+				acParcelResults.sort=sort;
+				acParcelResults.refresh();
+
+			} 
+		
+		private function onZoningFault(error:Object,faultString:String):void
+		{
+			Alert.show(error.toString(), "onZoning Fault")
+		}
+		
+		
+		private function onBookMarkChange(event:Event):void
+	    {
+	    	var ext:Extent = new Extent(event.currentTarget.selectedItem.x1, event.currentTarget.selectedItem.y1, event.currentTarget.selectedItem.x2, event.currentTarget.selectedItem.y2);
+			map.extent = ext;
+	    }
+	    
+		 private function onExtentChanged(event:ExtentEvent):void
+		 {
+/* 		 	if (! event.extent.contains( Jump1.pointClicked))
+			{
+				clearSelected();
+	
+			} */
+		 }
+		 
+		 private function onNewSearch(event:Event):void
+		 {
+			var i:int = txtFindSite.text.indexOf(" ");
+			var j:int = txtFindSite.text.toUpperCase().search(" AND ");
+			var l:int = txtFindSite.text.search(" & ");
+			var m:int = txtFindSite.text.search(" @ ");
+			var n:int = txtFindSite.text.toUpperCase().search(" AT ");
+			if (j == -1 && l == -1 && m == -1 && n == -1 )
+			{
+				if (i > -1 && i < 10)
+				{
+					doSearchAddress(txtFindSite.text)
+				}
+				else
+				{
+					doSearchAPN(txtFindSite.text)
+				}
+			}
+			else
+			{
+				doSearchIntersection(txtFindSite.text)
+			}
+
+		 	
+		 }
+		 
+		private function doSearchAddress(addr:String):void
+		{
+			var addressObjectAddress:Object = 
+			{
+				Street: addr
+			}
+		
+			var myOutFieldsAddress:Array = ["HouseNum","Prefix Dir", "FacilityID"];
+			AddressLocator.addressToLocations(addressObjectAddress,myOutFieldsAddress,new AsyncResponder(onGeoResult, onGeoFault));
+		}
+		
+		private function doSearchAPN(addr:String):void
+		{
+			var addressObject:Object = 
+			{
+				SingleKey: addr
+			}
+		
+			var myOutFields:Array = ["Match_addr"];
+			APNLocator.addressToLocations(addressObject,myOutFields,new AsyncResponder(onGeoResult, onGeoFault));
+		}
+			private function doSearchIntersection(addr:String):void
+			{
+				var addressObjectAddress:Object = 
+					{
+						Street: addr
+					}
+				var myOutFields:Array = ["*"];
+				var intersectionLocator:Locator = new Locator("http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/GISSQL_Streets/GeocodeServer");
+				intersectionLocator.addressToLocations(addressObjectAddress,myOutFields,new AsyncResponder(onGeoResult, onGeoFault));
+			}
+		
+		private function onGeoResult(candidates:Array, token:Object = null):void 
+		{
+			if (candidates.length > 0)                    
+			{   
+	
+				//glAddress.clear();
+				//glAddress.refresh();
+				var addressCandidate:AddressCandidate = candidates[0];
+				var point1:MapPoint = addressCandidate.location;
+				var coordGraphic:Graphic = new Graphic(point1,smsIdentify);
+				coordGraphic.geometry.spatialReference = new SpatialReference(2230)
+				var outSR:SpatialReference = new SpatialReference(102100);
+				geometry1.project([ point1 as Geometry],outSR);                        
+				
+			}
+			else
+			{
+				Alert.show("Could not find this location. Please check the information you entered and try again")
+			}
+		}
+		
+		private function onGeoFault(info:Object, token:Object = null):void                
+		{                    
+			Alert.show("Failure: \n" + info.toString());                
+		}
+		
+
+		 public function getURLParameters():Object
+		 {
+		 	var result:URLVariables = new URLVariables();
+		 	try 
+		 	{                    
+		 		if (ExternalInterface.available)
+		 		{ 
+			 		// Use JavaScript to get the search string from the current 
+			 		//browser location. Use substring() to remove leading '?'. 
+			 		// See http://livedocs.adobe.com/flex/3/langref/flash/external/ExternalInterface.html 
+			 		var search:String = ExternalInterface.call("location.search.substring", 1);
+			 		if (search && search.length > 0)
+			 		{
+			 			result.decode(search);
+			 		}
+		 		}
+		 	}
+			catch (error:Error)
+			{
+				Alert.show(error.message,"URL Params Error");
+			}
+			return result;
+		 }
+			
+	 
+	        private function onProjectComplete(event:GeometryServiceEvent):void
+	        {
+				var pt:MapPoint = (event.result as Array)[0]as MapPoint;
+				currentPoint = pt;
+				clearSelected();
+				mpIDPoint = pt;
+				doQuery(pt);
+				if (spMain.IsOpen)
+				{
+					map.centerAt(pt);
+					map.scale = 1128.497176;
+					var screenpt:Point = map.toScreen(map.extent.center);
+					screenpt.x = screenpt.x + (map.width * .75);
+					pt = map.toMap(screenpt);
+				}
+				else
+				{
+					map.centerAt(pt);
+					map.scale = 1128.497176;
+				}
+	
+	
+	        	
+	        }
+	
+	        private function onProjectFault(info:Object, token:Object = null):void
+	        {
+	        	Alert.show(info.toString());
+	        }
+			
+			//here we process the result of the identify operation. Results are looped through
+			//and values assigned to the correct text varible. the controls on the various results panels are bound to 
+			//these variables. We cannot assign to the controls directly as they only exist when the parent panel is visible
+			private function onSiteProfileResult(results:Array, clickGraphic:Graphic = null):void
+			{
+				//Result1 = results
+	
+				var result:IdentifyResult;
+				var AddressOBJIDs:Array = new Array;
+				var BMPOBJIDs:Array = new Array;
+				var subdivOBJIDs:Array = new Array;
+				for (var i:int= 0; i < results.length; i++)
+				{
+					result = results[i];
+					if (result.layerName == "Site Addresses")
+					{
+ 						result.feature.symbol = smsAddress;
+						arrayAddresses.addItem(result.feature);
+
+						var obj:Object = result.feature.attributes;
+						Result1.addItem({Address: obj["FullAddress"], Type: obj["Type"], FacilityID: obj["FacilityID"], Businesses: "False"});
+						AddressOBJIDs.push(result.feature.attributes.OBJECTID); 
+					}
+					else if (result.layerName == "Subdivisions")
+					{
+						
+						if (result.feature.geometry.extent.contains(currentPoint))
+						{
+							result.feature.symbol = sfsSubdiv;
+							arraySubdivResult.addItem(result.feature);
+							arrcSubdiv.addItem({Type: result.feature.attributes.Type, Name: result.feature.attributes.Name,LegalStartDate: result.feature.attributes.LegalStartDate,StatedArea: result.feature.attributes.StatedArea,Historical: result.feature.attributes.Historical,MiscloseDistance: result.feature.attributes.MiscloseDistance,MaxDwellingUnits: result.feature.attributes.MaxDwellingUnits,PlanID: result.feature.attributes.PlanID,OBJECTID: result.feature.attributes.OBJECTID});
+							subdivOBJIDs.push(result.feature.attributes.OBJECTID);
+						}
+					}
+					else if (result.layerName == "Permit")
+					{
+						arrayPermits.addItem(result.feature);
+						acGradingPermits.addItem({PermitType: result.feature.attributes.PermitType, PermitYear: result.feature.attributes.PermitYear, PermitSequence: result.feature.attributes.PermitSequence, OBJECTID: result.feature.attributes.OBJECTID});
+					}
+					else if (result.layerName == "Preplan")
+					{
+						if (result.feature.attributes.PrePlanNumber || result.feature.attributes.PrePlanName)
+						{
+							txtFirePrePlan = result.feature.attributes.PrePlanNumber + " - " + result.feature.attributes.PrePlanName;
+						}
+					}
+					else if (result.layerName == "Historic Parcels")
+					{
+						acHistoricParcels.addItem({APN: result.feature.attributes.APN});
+					}
+					else if (result.layerName == "Fire Response Time Zones")
+					{
+						arr3MinZone.addItem({FireStation: result.feature.attributes.FireStation});
+					}
+					else if (result.layerName == "High Fire Hazard Zones")
+					{
+						txtFireHH = "Yes";
+					}
+					else if (result.layerName == "Lock Box")
+					{
+						if (result.feature.attributes.Item =="3503")
+						{
+							txtSheriffKnox = "Yes";
+						}
+					}
+					
+					else if (result.layerName == "Sherriff Evacuation Zones")
+					{
+						txtEvacArea = result.feature.attributes.EvacuationZone;
+					}
+					else if (result.layerName == "Public Safety Grid")
+					{
+						txtFireGrid = result.feature.attributes.FPage;
+					}
+					else if (result.layerName == "Water Districts")
+					{
+						txtWaterDist = result.feature.attributes.NameFull;
+						if (txtWaterDist == "Olivenhain Municipal Water")
+						{
+							if (lblWDWarning)
+							{
+								lblWDWarning.visible = true;
+							}							
+							txtWaterCycle = "NA";
+							arrWaterMeters.removeAll();
+							arrWaterMeters.addItem({MeterNumber: "NA"});
+						}
+						
+						
+					}
+					else if (result.layerName == "Water Meters")
+					{
+						arrWaterMeters.addItem({MeterNumber: result.feature.attributes.MeterNumber});
+					}
+					else if (result.layerName == "Meter Cycle Districts")
+					{
+						txtWaterCycle =result.feature.attributes.CYCLE;
+					}
+					
+					else if (result.layerName == "Recycled Water Sites")
+					{
+						txtWaterRecycled ="Yes";
+					}
+					else if (result.layerName == "BMP Points")
+					{
+						arrcBMPs.addItem({Location: result.feature.attributes.Location, Type: result.feature.attributes.Type, CovenantNumber: result.feature.attributes.CovenantNumber});
+						BMPOBJIDs.push(result.feature.attributes.OBJECTID);
+					}
+						
+					else if (result.layerName == "Encinitas Zoning")
+					{
+						txtBaseZoning = result.feature.attributes.ZoneDesignation;
+						txtSpecificZone = result.feature.attributes.SpecificPlanName;
+					}
+					else if (result.layerName == "General Plan")
+					{
+						txtGPZone = result.feature.attributes.GPDesignation;
+					}
+ 					else if (result.layerName == "Permit Areas")
+					{
+						strPermitProritu = result.feature.attributes.SUSMPPriorityLevel;
+					}
+					else if (result.layerName == "Sewer District")
+					{
+						txtSewerDist = result.feature.attributes.NameFull;
+					}
+					else if (result.layerName == "Sewer Reimbursement District")
+					{
+						txtSewerReimbursement = result.feature.attributes.REIMBURSMENTNAME;
+					}
+					else if (result.layerName == "Sewer Discharge Permit")
+					{
+						arrcSewerPermits.addItem({FacilityID: result.feature.attributes.FacilityID, PERMITPREFIX: result.feature.attributes.PermitPrefix, PERMITYEAR: result.feature.attributes.PermitYear, PERMITSEQUENCE: result.feature.attributes.PermitSequence, EDUTHISPERMIT: result.feature.attributes.EDUThisPermit});
+					}
+					else if (result.layerName == "Sewer Discharge Point")
+					{
+						arrcSewerEDU.addItem({FacilityID: result.feature.attributes.FacilityID, EDUTHISPOINT: result.feature.attributes.EDUTHISPOINT, DischargePermitFacilityID: result.feature.attributes.DischargePermitFacilityID});
+					}
+					
+				}
+				
+ 				if (AddressOBJIDs.length > 0)
+				{
+					relatedBusinesses.objectIds = AddressOBJIDs;
+					queryAddressesTask.executeRelationshipQuery(relatedBusinesses, new AsyncResponder(onResult2, onFault2));
+				} 
+				if (BMPOBJIDs.length >0)
+				{
+					relatedPermits.objectIds = BMPOBJIDs;
+					BMPQuery.executeRelationshipQuery(relatedPermits,new AsyncResponder(onPermitQueryResult, onPermitQueryFault));
+				}
+				if (subdivOBJIDs.length > 0)
+				{
+					relatedPlans.objectIds = subdivOBJIDs;
+					SubdivisionQuery.executeRelationshipQuery(relatedPlans,new AsyncResponder(onPlansQueryResult, onPlanQueryFault));
+				}
+				
+				
+	
+				if(Result2.length == 0)
+				{
+					Result2.addItem("")
+				}
+ 				if(Result1.length == 0)
+				{
+					Result1.addItem("")
+				} 
+				
+				lblAddreesCount.text =  Result1.length.toString();
+				
+				//if the permits tab is visable already expand the permits
+				if (adgPermits)
+				{
+					adgPermits.expandAll();
+				}
+
+	
+				//fabricAttributes = [results[0],results[1]];
+			}
+			
+			
+		private function onResult2(results:Object, token:Object = null):void
+		{
+			
+			//Result3 = queryAddressesTask.executeRelationshipQueryLastResult
+ 			for each( var RelatedResultFS:FeatureSet in results)
+			{ 
+				//adgBusinesses.dataProvider = RelatedResultFS.attributes
+				//Result3.addItem(RelatedResultFS.features)
+				var sortField2:SortField = new SortField("FacilityID", true);
+				var sort2:Sort = new Sort();
+				sort2.fields = [sortField2];
+				
+				Result1.sort = sort2;
+				Result1.refresh();
+
+				var curAddr:IViewCursor = Result1.createCursor();
+
+ 				for each( var RelateResultGraphic:Graphic in RelatedResultFS.features)
+				{
+					var found:Boolean = curAddr.findAny({FacilityID: RelateResultGraphic.attributes["AddressFacilityID"]});
+					if (found)
+					{
+						curAddr.current.Businesses = "True"
+
+					}
+					Result3.addItem({AddressFacilityID: RelateResultGraphic.attributes["AddressFacilityID"], BusinessName: RelateResultGraphic.attributes["BusinessName"], HDLAccount: RelateResultGraphic.attributes["HDLAccount"]});
+				} 
+				
+			}
+			lblBusinessCount.text = Result3.length.toString();
+		}
+			
+		private function onFault2(info:Object, token:Object = null):void
+		{
+			Alert.show(info.toString(), "queryAddressesTask");
+		}
+		
+
+			
+		private function onLandRecordsFault(error:Object, clickGraphic:Graphic = null):void
+		{
+			Alert.show(String(error), "Identify Error");
+
+		}
+			private function onPermitQueryResult(results:Object, token:Object = null):void
+			{
+				for each( var RelatedResultFS:FeatureSet in results)
+				{
+					for each( var RelateResultGraphic:Graphic in RelatedResultFS.features)
+					{
+						switch (RelateResultGraphic.attributes.swSUSMPPriorityLevel)
+						{
+							case "1":
+							{
+								strPermitProritu = "Priority Project";
+								break;
+							}
+							case "2":
+							{
+								strPermitProritu = "Standard";
+								break;
+							}
+							case "3":
+							{
+								strPermitProritu = "Exempt";
+								break;
+							}
+							case "4":
+							{
+								strPermitProritu = "Not Priority Project";
+								break;
+							}
+							case "0":
+							{
+								strPermitProritu = "Unknown";
+								break;
+							}
+							default:
+							{
+								strPermitProritu = "NA"
+								break;
+							}
+						}
+						acBMPPermits.addItem({ProjectName: RelateResultGraphic.attributes.ProjectName, Priority: strPermitProritu});
+					}
+				}
+			}
+			private function onPermitQueryFault(info:Object, token:Object = null):void
+			{
+				Alert.show(info.toString(), "Query related Permits Problem");
+			}
+			
+			//Handles the result of querying related Plans from the identified fabric polygoons
+			private function onPlansQueryResult(results:Object, token:Object = null):void
+			{
+				for each( var RelatedResultFS:FeatureSet in results)
+				{
+					for each( var RelateResultGraphic:Graphic in RelatedResultFS.features)
+					{
+						arrcPlans.push(RelateResultGraphic)
+					}
+					
+				}
+			}
+			private function onPlanQueryFault(info:Object, token:Object = null):void
+			{
+				Alert.show(info.toString(), "Query related Plans Table Problem");
+			}
+			
+			
+			
+		private function tabBar_creationComplete():void 
+		{
+
+		}
+			
+		private function tabBar_itemClick(evt:MouseEvent):void 
+		{
+			
+			
+		}
+			
+
+		//Causes related businesses in the business advanced datagrid to expand and hight related busines
+			//when user moves mouse into address row in address datagrid
+		private function onMouseOverCell(event:MouseEvent):void
+		{
+			var dgColumn:AdvancedDataGridItemRenderer = event.target as AdvancedDataGridItemRenderer;
+			if (dgColumn)
+			{
+				var gr: Graphic = findGraphicByAttribute(dgColumn.data,glAddress);
+				if (gr)
+				{
+					var graphic:Geometry = gr.geometry;
+					onAddGlow(gr);
+					
+					//gr.symbol = highlightedSymbol;
+					//trace(dgColumn.data.FacilityID);
+					if (dgResult1.selectedIndex == -1)
+					{
+						var dataCursor:HierarchicalCollectionViewCursor = adgBusinesses.dataProvider.createCursor();
+						while (dataCursor.current) 
+						{
+							if (dataCursor.current.GroupLabel == dgColumn.data.FacilityID)
+							{
+								adgBusinesses.dataProvider.openNode(dataCursor.current);
+								adgBusinesses.expandItem(dataCursor.current,true);
+								
+							}
+							else
+							{
+								adgBusinesses.dataProvider.closeNode(dataCursor.current);
+								
+							}
+							dataCursor.moveNext();
+						}
+						adgBusinesses.findString(dgColumn.data.FacilityID);
+						adgBusinesses.expandItem(adgBusinesses.selectedItem,true);
+						adgBusinesses.invalidateDisplayList();
+						adgBusinesses.invalidateList();
+					}
+				}
+				
+
+			}
+		}
+		private function onAddGlow( gr:Graphic ) : void
+		{
+			//var gr:Graphic = findGraphicByAttribute(event.itemRenderer.data)
+			var glow:Glow = new Glow(gr);
+			glow.duration = 1000 ;
+			glow.alphaFrom = 1 ;
+			glow.alphaTo = 0 ;
+			glow.blurXFrom = 20 ;
+			glow.blurXTo = 0 ;
+			glow.blurYFrom = 30 ;
+			glow.blurYTo = 0 ;
+			glow.strength = 40;
+			glow.color = 0xFFFF33;
+			
+			glow.play();
+		}
+			
+			//adds the glow effect to subdivision boundries
+			private function onAddPolyGlow( gr:Graphic ) : void
+			{
+				gr.alpha = 1;
+				gr.symbol = sfsSubdiv;
+				gr.refresh();
+				glower.play([gr]);
+				animating = true;
+				glower.duration = 300
+			}
+			
+			//removes the glow effect to subdivision boundries
+			private function onRemovePolyGlow( gr:Graphic ) : void
+			{
+				gr.symbol = sfsSubdiv;
+				gr.refresh();
+				glower.end(); 
+				animating = false; 
+				
+			}
+		/* ------------------------------------------------
+		Find Graphics by Attribute
+		---------------------------------------------- */
+		private function findGraphicByAttribute(attributes:Object,sourcegraphicslayer:GraphicsLayer):Graphic
+		{
+			for each(var graphic:Graphic in sourcegraphicslayer.graphicProvider )
+			{
+				if (graphic.attributes.FacilityID == attributes.FacilityID)
+				{
+					return graphic;
+				}
+			}
+			return null;
+		}
+			private function findPlanByAttribute(attributes:Object,sourcegraphicslayer:GraphicsLayer):Graphic
+			{
+				for each(var graphic:Graphic in sourcegraphicslayer.graphicProvider )
+				{
+					if (graphic.attributes.OBJECTID == attributes.OBJECTID)
+					{
+						return graphic;
+					}
+				}
+				return null;
+			} 
+
+			//As the tabs on the top of the app are clicked this function will turn on just the map layers that are on by
+			//default when the map is first loaded. It will also make jusr the graphics layer corresponding to that tab 
+			//visible
+			protected function viewStackSiteProfiler_changeHandler(event:IndexChangedEvent):void
+			{
+				//turn off everything first
+				glAddress.visible = false;
+				glSubdivision.visible = false;
+				glPermits.visible = false;
+				DistrictsService.visible=false;
+				glDistrictsServices.visible = false;
+				SiteProfileService.visibleLayers.removeAll();
+				
+				if 	(event.newIndex==0)
+				{
+					glAddress.visible = true;
+					addLayer(getLayerInfoID(SiteProfileService.layerInfos,"Address Info"),SiteProfileService);
+				}
+				else if 	(event.newIndex==1)
+				{
+					glSubdivision.visible = true;
+					addLayer(getLayerInfoID(SiteProfileService.layerInfos,"Land Records"),SiteProfileService);
+				}
+				else if 	(event.newIndex==2)
+				{
+					addLayer(getLayerInfoID(SiteProfileService.layerInfos,"Permits"),SiteProfileService);
+					glPermits.visible=true;
+					adgPermits.expandAll();
+					adgPermits.invalidateDisplayList();
+					gcPermits.refresh();
+				}
+				else if 	(event.newIndex==3)
+				{
+					addLayer(getLayerInfoID(SiteProfileService.layerInfos,"Assessor Info"),SiteProfileService);
+				}
+				else if 	(event.newIndex==4)
+				{
+					addLayer(getLayerInfoID(SiteProfileService.layerInfos,"Districts & Services"),SiteProfileService);
+					DistrictsService.visible=true;
+					glDistrictsServices.visible = true;
+					addLayer(getLayerInfoID(DistrictsService.layerInfos,"Districts & Services"),DistrictsService);
+				}
+				else if 	(event.newIndex==5)
+				{
+					addLayer(getLayerInfoID(SiteProfileService.layerInfos,"Sewer"),SiteProfileService);
+				}
+				else if 	(event.newIndex==6)
+				{
+					addLayer(getLayerInfoID(SiteProfileService.layerInfos,"Water"),SiteProfileService);
+				}
+				else if 	(event.newIndex==7)
+				{
+					addLayer(getLayerInfoID(SiteProfileService.layerInfos,"Stormwater"),SiteProfileService);
+				}
+				else if 	(event.newIndex==8)
+				{
+					addLayer(getLayerInfoID(SiteProfileService.layerInfos,"Public Safety"),SiteProfileService);
+				}
+				else if 	(event.newIndex==9)
+				{
+					addLayer(getLayerInfoID(SiteProfileService.layerInfos,"Zoning"),SiteProfileService);
+				}
+			}
+			
+
+			//takes a grouplayer layerInfo and turns on all sublayers that are on by default
+			private function addLayer(layerInfo:LayerInfo, DynamicService:ArcGISDynamicMapServiceLayer):void
+			{
+				//var visibleLayers:ArrayCollection;
+				//visibleLayers = SiteProfileService.visibleLayers;
+				//SiteProfileService.visibleLayers.addItem(layerInfo.id);
+				//SiteProfileService.visibleLayers.addItem(layerInfo.id);
+				if (layerInfo.subLayerIds)
+				{
+					if ( layerInfo.subLayerIds.length > 0)
+					{
+						
+						var sublayers:Array = layerInfo.subLayerIds;
+						for (var i:int = 0; i < sublayers.length; i++)
+						{
+							
+							trace (DynamicService.layerInfos[sublayers[i]].name);
+							trace (DynamicService.layerInfos[sublayers[i]].defaultVisibility);
+							
+							if (DynamicService.layerInfos[sublayers[i]].defaultVisibility == true)
+							{
+								DynamicService.visibleLayers.addItem(sublayers[i]);
+							}
+							else
+							{
+								var idIndex:int = DynamicService.visibleLayers.getItemIndex(sublayers[i]);
+								if (idIndex != -1)
+								{
+									DynamicService.visibleLayers.removeItemAt(idIndex); 
+								}
+							}
+						} 
+					}
+				}
+				 
+				
+			}
+			
+			//given an array of layerinfos and a layername returns the layer ID
+			private function getLayerInfoID(layerInfos:Array, layerName:String):LayerInfo
+			{
+				var info:LayerInfo;
+				for (var i:int = 0; i < layerInfos.length; i++)
+				{
+					if (layerInfos[i].name == layerName)
+					{
+						info = layerInfos[i]
+					}
+				}
+				return info
+			}
+
+			protected function txtFindSite_focusInHandler(event:FocusEvent):void
+			{
+				txtFindSite.selectAll();
+				//txtFindSite.setSelection(0,txtFindSite.text.length)
+			}
+
+
+			protected function Addresses_loadHandler(event:LayerEvent):void
+			{
+				// Loop through and get indexes for the layers we need to query incase they have been
+				//changed in the mapservice
+				var dynamicLayer:ArcGISDynamicMapServiceLayer = event.layer as ArcGISDynamicMapServiceLayer;
+				dynamicLayer.getAllDetails(new AsyncResponder(onGetAllDetails,onGetAllDetailsFault));
+				
+			}
+			
+			//this app uses many queries which are based on a url containing the index of the map 
+			//layer being queried. Over time the map service can change messing up the indexes
+			//Here we seach all service layers by name and add their index to the end of the relevent 
+			//query url string
+			private function onGetAllDetails(result:Object, token:Object = null):void
+			{
+				AllDetailresults = result as AllDetails;
+			
+				var deatils:Array = AllDetailresults.layersDetails;
+				var i:int;
+				var arrRelationships:Array;
+				var relat:Relationship;
+				for(var layerDetails:Object in deatils )
+				{
+					if (deatils[layerDetails].name == "Site Addresses")
+					{
+						queryAddressesTask.url = queryAddressesTask.url + deatils[layerDetails].id;
+						 arrRelationships= deatils[layerDetails].relationships;
+						for (i = 0; i < arrRelationships.length; i++)
+						{
+							relat = arrRelationships[i];
+							if (relat.name == "has business")
+							{
+								relatedBusinesses.relationshipId = relat.id;
+							}
+						}
+					}
+					else if (deatils[layerDetails].name == "BMP Points")
+					{
+						BMPQuery.url = BMPQuery.url + deatils[layerDetails].id;
+						 arrRelationships= deatils[layerDetails].relationships;
+						for ( i = 0; i < arrRelationships.length; i++)
+						{
+							relat = arrRelationships[i];
+							if (relat.name == "BMPPoint_Has_PermitPoly")
+							{
+								relatedPermits.relationshipId = relat.id;
+							}
+						}
+					}
+					
+					else if (deatils[layerDetails].name == "Subdivisions")
+					{
+						SubdivisionQuery.url = SubdivisionQuery.url + deatils[layerDetails].id;
+						arrRelationships= deatils[layerDetails].relationships;
+						for ( i = 0; i < arrRelationships.length; i++)
+						{
+							relat = arrRelationships[i];
+							if (relat.name == "cedata.CEDATA.EncinitasFabric_Plans")
+							{
+								relatedPlans.relationshipId = relat.id;
+							}
+						}
+					}
+				}
+			}
+			private function onGetAllDetailsFault(error:FaultEvent, token:Object = null):void
+			{
+				Alert.show(error.message.toString(),"onGetAllDetailsFault");
+			}
+
+			//event handler for when the sliding panel is either expanded or collapsed. Changes the centerpoint of
+			//the map accordingly
+			protected function spMain_annimationendedHandler(event:SlidingPanelEvent):void
+			{
+				
+				var screenpt:Point = map.toScreen(map.extent.center);
+				if ( ! spMain.IsOpen)
+				{
+					screenpt.x = screenpt.x - (map.width * .2);
+					var pt:MapPoint = map.toMap(screenpt);
+					map.centerAt(pt);
+					//map.scale = 1128.497176;
+				}
+				else
+				{
+					screenpt.x = screenpt.x + (map.width * .2);
+					pt = map.toMap(screenpt);
+					map.centerAt(pt);
+					//map.scale = 1128.497176;
+				}
+			}
+
+			//all array and string that hold results of identify opperation are reset 
+			private function clearSelected():void
+			{
+				if ( myParcelCursor)
+				{
+					while (! myParcelCursor.afterLast)
+					{
+						myParcelCursor.remove();
+					}
+				}
+
+				
+				acParcelResults.removeAll();
+				acParcelResults.refresh();
+				lblAddreesCount.text = "0";
+				lblBusinessCount.text = "0";
+				graphicsLayer.clear();
+				arrcAddressRelatedToPoints.removeAll();
+				glAddress.clear();
+				Result1.removeAll();
+				Result2.removeAll();
+				Result3.removeAll();
+				acBMPPermits.removeAll();
+				acGradingPermits.removeAll();
+				if (gcPermits)
+				{
+					gcPermits.refresh();
+				}
+				arrayAddresses.removeAll();
+				arrayPermits.removeAll();
+				acHistoricParcels.removeAll();
+				gc.refresh();
+				glSubdivision.clear();
+				txtPlanName = "";
+				txtLglDate = "";  
+				txtPCntyRecording = "";
+				txtSurveyDate = ""; 
+				txtSurveyor = "";
+				txtCompany = "";
+				txtPDescription = "";
+				txtPResDevel = "";
+				arr3MinZone.removeAll();
+				txtEvacArea = "";
+				txtFireGrid = "";
+				txtFireHH = "No";
+				txtSheriffKnox = "No"
+				txtFirePrePlan = "NA";
+				arrWaterMeters.removeAll();
+				txtWaterDist = "";
+				txtWaterCycle = "";
+				txtWaterRecycled = "No";
+				if (lblWDWarning)
+				{
+					lblWDWarning.visible = false;
+				}
+				arrcBMPs.removeAll();
+				strPermitProritu = "NA";
+				if (lblAPN)
+				{
+					lblAPN.text = "";
+				}
+				txtSewerDist="";
+				txtSewerReimbursement="NA";
+				arrcSewerEDU.removeAll();
+				arrcSewerPermits.removeAll();
+				arrcSubdiv.removeAll();
+			}
+
+
+
+
+			//Handler for when mouse moves over a cell in the subdivision datagrid. Controls the glow effect
+			//on the PLan details display
+			protected function dgSubdiv_mouseOverHandler(event:MouseEvent):void
+			{
+				var dgColumn:AdvancedDataGridItemRenderer = event.target as AdvancedDataGridItemRenderer;
+				if (dgColumn)
+				{
+					if (dgSubdiv.selectedIndex < 0)
+					{
+						var gr: Graphic = findPlanByAttribute(dgColumn.data,glSubdivision);
+						if (gr)
+						{
+							var graphic:Geometry = gr.geometry;
+							onAddPolyGlow(gr);
+							for (var i:int = 0; i < arrcPlans.length; i++)
+							{
+								if (arrcPlans[i].attributes.OBJECTID == gr.attributes.PlanID)
+								{
+									txtPlanName = arrcPlans[i].attributes.Name;
+									txtLglDate = new Date(arrcPlans[i].attributes.LegalDate).toDateString();  
+									txtPCntyRecording = arrcPlans[i].attributes.RecordingYear + " - " + arrcPlans[i].attributes.RecordingSequence
+									txtSurveyDate = new Date(arrcPlans[i].attributes.SurveyDate).toDateString(); 
+									txtSurveyor = arrcPlans[i].attributes.Surveyor 
+									txtCompany = arrcPlans[i].attributes.Company 
+									txtPDescription = arrcPlans[i].attributes.Description 
+									txtPResDevel = arrcPlans[i].attributes.IsPlanResidentialDevelopment 
+								}
+							}
+						}
+					}
+				}
+
+			}
+
+			//Handler for when mouse moves out a cell in the subdivision datagrid.Removes glow effect
+			protected function dgSubdiv_mouseOutHandler(event:MouseEvent):void
+			{
+				if (dgSubdiv.selectedIndex < 0)
+				{
+					var dgColumn:AdvancedDataGridItemRenderer = event.target as AdvancedDataGridItemRenderer;
+					if (dgColumn)
+					{
+						var gr: Graphic = findPlanByAttribute(dgColumn.data,glSubdivision);
+						if (gr)
+						{
+							var graphic:Geometry = gr.geometry;
+							onRemovePolyGlow(gr);
+							txtPlanName = "";
+							txtLglDate = "";  
+							txtPCntyRecording = "";
+							txtSurveyDate = ""; 
+							txtSurveyor = "";
+							txtCompany = "";
+							txtPDescription = "";
+							txtPResDevel = "";
+						}
+					}
+				}
+				
+			}
+			
+
+			protected function btnZoningDetails_clickHandler(event:MouseEvent):void
+			{
+				navigateToURL(new URLRequest( 'http://ezoning.cityofencinitas.org/zoningtest.html?X=' + mpIDPoint.x + '&Y=' + mpIDPoint.y + '&start=extent&xmin=' + map.extent.xmin + '&ymin=' + map.extent.ymin + '&xmax=' + map.extent.xmax + '&ymax=' + map.extent.ymax ),"quote");
+			}
+
+
+			protected function BasemapPlus_loadHandler(event:LayerEvent):void
+			{
+				var hp:helperClass = new helperClass;
+				var i:String =  hp.getLayerID("Parcels", BasemapPlus.layerInfos);
+				if (i != "-1")
+				{
+					
+					queryParcels.url = queryParcels.url + "/" + i;
+					
+				}
+			}
+
+
+			protected function zoomSelected_clickHandler(event:MouseEvent):void
+			{
+				var gp:ArrayCollection =  graphicsLayer.graphicProvider as ArrayCollection;
+				for each (var graphic:Graphic in gp)
+				{
+					if (spMain.IsOpen)
+					{
+						map.centerAt(graphic.geometry.extent.center);
+						map.scale = 1128.497176;
+						var screenpt:Point = map.toScreen(map.extent.center);
+						//screenpt.x = screenpt.x + (map.width * .25);
+						screenpt.x = screenpt.x - (spMain.width/ 2);
+						var pt:MapPoint = map.toMap(screenpt);
+						map.centerAt(pt);
+						map.scale = 1128.497176;
+					}
+					else
+					{
+						map.centerAt(graphic.geometry.extent.center);
+						map.scale = 1128.497176;
+					}
+				}
+			}
+
+
+			protected function adgDischargePermits_mouseOverHandler(event:MouseEvent):void
+			{
+				var dgColumn:AdvancedDataGridItemRenderer = event.target as AdvancedDataGridItemRenderer;
+				if (dgColumn)
+				{
+					strBMPFacilityID =  dgColumn.data.DischargePermitFacilityID;
+					adgDischargePermits.invalidateDisplayList();
+				}
+			}
+
+
+			protected function btnHelp_clickHandler(event:MouseEvent):void
+			{
+				navigateToURL(new URLRequest( parentApplication.url.substring(0, parentApplication.url.lastIndexOf("/") + 1) + "/HELPsheet.htm"));
+			}
+
+
+			protected function tabBar_changeHandler(event:IndexChangeEvent):void
+			{
+ 				if (event.target.selectedItem.id == "Permits")
+				{
+					if (adgPermits)
+					{
+						adgPermits.expandAll();
+					}
+				} 
+			}
+
+			protected function Permits_showHandler(event:FlexEvent):void
+			{
+				adgPermits.expandAll();
+			}
+
+
+			protected function adgPermits_mouseOverHandler(event:MouseEvent):void
+			{
+				var dgColumn:AdvancedDataGridItemRenderer = event.target as AdvancedDataGridItemRenderer;
+				if (dgColumn)
+				{
+
+						var gr: Graphic = findPlanByAttribute(dgColumn.data,glPermits);
+						if (gr)
+						{
+							onAddPolyGlow(gr);
+						}
+
+				}
+
+			}
+
+
+			protected function adgPermits_mouseOutHandler(event:MouseEvent):void
+			{
+				var dgColumn:AdvancedDataGridItemRenderer = event.target as AdvancedDataGridItemRenderer;
+				if (dgColumn)
+				{
+					var gr: Graphic = findPlanByAttribute(dgColumn.data,glPermits);
+					if (gr)
+					{
+						onRemovePolyGlow(gr);
+					}
+				}
+			}
+
+
+			protected function btnLandRecsApp_clickHandler(event:MouseEvent):void
+			{
+				navigateToURL(new URLRequest( 'http://gisweb:9231/LandRecords?X=' + mpIDPoint.x + '&Y=' + mpIDPoint.y + '&start=extent&xmin=' + map.extent.xmin + '&ymin=' + map.extent.ymin + '&xmax=' + map.extent.xmax + '&ymax=' + map.extent.ymax ),"quote");
+			}
+
+		]]>
+	
+	</fx:Script>
+	
+	<fx:Declarations>
+	
+
+		
+		<esri:NavigationTool id="navToolbar" map="{map}"/>
+		
+		<esri:Locator id="AddressLocator"
+					  url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/GISSQL_Address/GeocodeServer"/>
+		
+		<esri:Locator id="APNLocator"
+					  url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/GISSQL_APN/GeocodeServer"/>
+		
+		<!-- symbol to store geocode result so it can be reprojected -->
+		<esri:SimpleMarkerSymbol id="smsIdentify" style="diamond" color="0x00FF00" size="15"/>
+		
+		<esri:SimpleMarkerSymbol id="smsAddress" color="0x66CC00" size="11.3" alpha="1" style="diamond">
+			<esri:SimpleLineSymbol color="0x66CCCC" width="3" alpha="1" style="solid" />
+		</esri:SimpleMarkerSymbol>
+		
+		<esri:SimpleFillSymbol  id="fillSymbol" color="0xFF0033" alpha="0.25" style="null">
+			<esri:SimpleLineSymbol color="0x6600FF" width="4" alpha="1" style="dashdotdot" />
+		</esri:SimpleFillSymbol>
+
+		<esri:SimpleFillSymbol id="symTransparent" alpha="0" color="0x00000000">
+			
+		</esri:SimpleFillSymbol>
+		
+		<esri:SimpleFillSymbol id="smsParcel" alpha="0" style="solid">
+			<esri:SimpleLineSymbol id="slsFabricOutline" color="0x6600FF" width="4" alpha="0" style="dashdotdot" />
+		</esri:SimpleFillSymbol>
+		
+		<esri:SimpleFillSymbol id="sfsSubdiv" color="0x00FF66" alpha="0" style="solid">
+			<esri:SimpleLineSymbol color="0x990000" width="3" alpha="1" style="dash" />
+		</esri:SimpleFillSymbol>
+		
+		<s:GradientGlowFilter id="glow" 
+							  blurX="10" blurY="10"
+							  quality="{BitmapFilterQuality.HIGH}"
+							  type="{BitmapFilterType.OUTER}" 
+							  knockout="false" >
+			<s:entries>
+				<s:GradientEntry alpha="0" color="0xFF0000" ratio="0"/>
+				<s:GradientEntry alpha="1" color="0xFFFF00" ratio="128"/>
+				<s:GradientEntry alpha="1" color="0xFFFFFF" ratio="255"/>
+			</s:entries>
+		</s:GradientGlowFilter>
+		
+		<s:AnimateFilter id="glower" bitmapFilter="{glow}" 
+						 duration="6000" repeatCount="0" repeatBehavior="{RepeatBehavior.REVERSE}" >
+			<s:SimpleMotionPath property="strength" valueFrom="0" valueTo="5" /> 
+		</s:AnimateFilter>
+		
+		
+		<esri:IdentifyTask id="SiteProfiler_Identify" 
+						   url="http://gisweb:9231/Internal/rest/services/secured/SiteProfiler/MapServer"
+						   concurrency="last"
+						   showBusyCursor="true" />
+		
+<!--		<esri:RelationshipQuery id="relatedPlanParcels"
+								outFields="[AddressFacilityID,BusinessName,BusinessPhone]"
+								relationshipId="1"
+								returnGeometry="true"
+								/>-->
+		<esri:GeometryService id="geometry1"
+							  concurrency="last"
+							  projectComplete="onProjectComplete(event)"
+							  fault="onProjectFault(event)"
+							  url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Geometry/GeometryServer"/>
+		
+		<esri:QueryTask id="queryParcels"
+						showBusyCursor="true"						
+						url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/BasemapPlus/MapServer"
+						executeComplete="onQueryParcelComplete(event)" 
+						useAMF="true">		
+		</esri:QueryTask>
+		
+		<esri:QueryTask id="queryAddressesTask"
+						showBusyCursor="true"
+						url="http://gisweb:9231/Internal/rest/services/Secured/SiteProfiler/MapServer/"
+						useAMF="true">
+		</esri:QueryTask>
+		
+		
+		<esri:Query	id="queryParcelParams"
+					spatialRelationship="esriSpatialRelIntersects"
+					returnGeometry="true"
+					outSpatialReference="{map.spatialReference}"
+					 >
+			<esri:outFields>
+				<fx:String>gispub.GIS.survey_TaxParcelFabric.APN</fx:String>
+				<fx:String>gispub.GIS.survey_TaxParcelFabric.ParcelID</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.OwnerName1</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.OwnerName2</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.SitusStreet</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.SitusCity</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.SitusState</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.SitusZip</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.MailToName</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.MailStreet</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.MailCity</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.MailZip</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.MailState</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.MailCountry</fx:String>
+				<fx:String>gispub.GIS.hdl_TaxRec.AbsenteeFlag</fx:String>
+			</esri:outFields>
+		</esri:Query>
+		
+
+		
+		<esri:QueryTask id="BMPQuery" url="http://gisweb:9231/Internal/rest/services/Secured/SiteProfiler/MapServer/" 
+						showBusyCursor="true" useAMF="true" />
+		<esri:QueryTask id="SubdivisionQuery" url="http://gisweb:9231/Internal/rest/services/secured/SiteProfiler/MapServer/" 
+						showBusyCursor="true" useAMF="true" />
+		
+		<esri:RelationshipQuery id="relatedBusinesses"
+								outFields="[AddressFacilityID, BusinessName, HDLAccount]"
+								returnGeometry="false"
+								/>
+		
+		<esri:RelationshipQuery id="relatedPermits"
+								outFields="[swSUSMPPriorityLevel, ProjectName]"
+								returnGeometry="false"
+								/>
+		<esri:RelationshipQuery id="relatedPlans"
+								outFields="[OBJECTID, Name, LegalDate, RecordingYear, RecordingSequence, SurveyDate, Surveyor, Company, Description, IsPlanResidentialDevelopment]"
+								returnGeometry="false"
+								/>
+	</fx:Declarations>
+	
+
+	<mx:Image id="bgImage" alpha=".75" source="Styles/plain_bluesteel.JPG" maintainAspectRatio="false" width="100%" height="100%"/>
+	
+		
+
+	<EncComponents:OverViewComponent id="overviewMap" 
+		parentMap="{map}" 
+		y = "{header.height + 40}">
+		
+	</EncComponents:OverViewComponent>
+	
+	<EncComponents:BackroundTransparancyControl id = "mapcontrol1" 
+		 y = "{header.height + 5}"
+		 x= "{appMain.width - 150}"
+		 basemapLayer="{reliefLayer}"
+		 imageLayer="{imageLayer}"
+		 toolTip="Use the slider to toggle between shaded relief and imagery">
+	</EncComponents:BackroundTransparancyControl>
+	
+	<EncComponents:BasemapTransparancyControl id="basmapControl1" 
+		y="{header.height + 5}"
+		x= "{appMain.width - 300}"
+		BMLayer="{basemapLayer}"
+		BMPlusLayer="{basemapPlusLayer}" >
+		
+	</EncComponents:BasemapTransparancyControl>
+	<s:HGroup id="spContainer" left="0"
+			  y="{basmapControl1.y}"
+			  width="100%">
+		
+	
+	<EncComponents:SlidingPanel id="spMain" anchor="Left" 
+								width="485"
+								y="{basmapControl1.y}"  
+								height="{cnvMap.height}" 
+								startupState="closed" animateended="spMain_annimationendedHandler(event)"  >
+			
+		<mx:ViewStack id="viewStackSiteProfiler"
+					  height="100%"
+					  change="viewStackSiteProfiler_changeHandler(event)"
+					  styleName="plain">
+			<s:NavigatorContent backgroundColor="haloSilver" id="SiteBasics" label="ADDRESS INFO">
+
+				<fx:Script>
+					<![CDATA[
+						import mx.events.ListEvent;
+						protected function dgResult1_itemClickHandler(event:ListEvent):void
+						{
+
+							var dgColumn:AdvancedDataGridItemRenderer = event.itemRenderer as AdvancedDataGridItemRenderer;
+							if (dgColumn)
+							{
+
+								var dataCursor:HierarchicalCollectionViewCursor = adgBusinesses.dataProvider.createCursor();
+								while (dataCursor.current) 
+								{
+									if (dataCursor.current.GroupLabel == dgColumn.data.FacilityID)
+									{
+										adgBusinesses.dataProvider.openNode(dataCursor.current);
+										adgBusinesses.expandItem(dataCursor.current,true);
+										
+									}
+									else
+									{
+										adgBusinesses.dataProvider.closeNode(dataCursor.current);
+										
+									}
+									dataCursor.moveNext();
+								}
+								adgBusinesses.findString(dgColumn.data.FacilityID);
+								adgBusinesses.expandItem(adgBusinesses.selectedItem,true);
+								adgBusinesses.invalidateDisplayList();
+								adgBusinesses.invalidateList();
+							}
+						}
+						
+						private function calcRowColor( item:Object, rowIndex:int, dataIndex:int, color:uint):uint
+						{
+							if(item.Businesses == "True")
+								return 0x49FFAD;
+							else
+								return color;
+						}
+						
+						private function calcDischargePermitRowColor( item:Object, rowIndex:int, dataIndex:int, color:uint):uint
+						{
+							if (strBMPFacilityID != "null")
+							{
+								if(item.FacilityID == strBMPFacilityID)
+									return 0x49FFAD;
+								else
+									return color;
+							}
+							else
+							{
+								return color;
+							}
+
+						}
+						private function date_sortCompareFunc(itemA:Object, itemB:Object):int {
+							/* Date.parse() returns an int, but
+							ObjectUtil.dateCompare() expects two
+							Date objects, so convert String to
+							int to Date. */
+							var dateA:Date = new Date(Date.parse(itemA.LegalStartDate));
+							var dateB:Date = new Date(Date.parse(itemB.LegalStartDate));
+							return ObjectUtil.dateCompare(dateA, dateB);
+						}
+						//Function to expand all nodes in a grouped data grid
+						private function openMe():void 
+						{ 
+							var obj:Object = gcPermits.getRoot(); 
+							var temp:Object = ListCollectionView(obj).getItemAt(0); 
+							adgPermits.expandItem(temp,true); 
+						}
+
+
+
+					]]>
+				</fx:Script>
+
+				<s:VGroup id="addrVBox" height="100%" width="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
+
+					<s:HGroup width="100%">
+						<s:Label id="lblAddrees" text="Addresses Found = " fontStyle="italic"/>
+						<s:Label id="lblAddreesCount" text="0" fontStyle="italic"/>
+					</s:HGroup>
+					
+					<EncComponents:RowColorDataGrid rowColorFunction="calcRowColor"
+						 id="dgResult1"  
+						 dataProvider="{Result1}" 
+						 wordWrap="true"  
+						 rowCount="{Result1.length}" 
+						 height="100%" width="100%" 
+						 variableRowHeight="true" 
+						 verticalScrollPolicy="auto" 
+						 mouseOver="{onMouseOverCell(event)}"
+						 itemClick="dgResult1_itemClickHandler(event)"
+						 textAlign="left">			
+						
+						 <EncComponents:columns>
+							 <mx:AdvancedDataGridColumn dataField="Address" headerText="Site Address" sortable="true" visible="true" width="{spMain.width / 2}"  />
+							 <mx:AdvancedDataGridColumn dataField="Type" headerText="Type" sortable="true" visible="true" width="{spMain.width / 4}" />
+							 <mx:AdvancedDataGridColumn dataField="FacilityID" headerText="FacilityID" sortable="true" visible="true" width="{spMain.width / 4}" />
+						 </EncComponents:columns>
+
+					</EncComponents:RowColorDataGrid>
+					<s:HGroup>
+						<s:Label id="lblBusiness" text="Associated Businesses = " fontStyle="italic"/>
+						<s:Label id="lblBusinessCount" text="0" fontStyle="italic"/>
+					</s:HGroup>
+						
+						
+					<mx:AdvancedDataGrid id="adgBusinesses" 
+										 width="100%" height="100%" 
+										 horizontalScrollPolicy="auto" 
+										 verticalScrollPolicy="auto" 
+										 selectable="true" 
+										 textAlign="left"
+										 wordWrap="true"
+										 variableRowHeight="true">
+						<mx:dataProvider>
+							<mx:GroupingCollection2 id="gc" source="{Result3}">
+								<mx:grouping>
+									<mx:Grouping>
+										<mx:GroupingField name="AddressFacilityID"/>
+									</mx:Grouping>
+								</mx:grouping>
+							</mx:GroupingCollection2>
+						</mx:dataProvider>   						
+						
+						
+						<mx:columns>	
+							<mx:AdvancedDataGridColumn dataField="AddressFacilityID" sortable="true" visible="true" width="{spMain.width / 5}" />
+							<mx:AdvancedDataGridColumn dataField="BusinessName" sortable="true" visible="true" width="{spMain.width / 2}" />
+							<mx:AdvancedDataGridColumn dataField="HDLAccount" sortable="true" visible="true" width="{spMain.width / 5}" />
+						</mx:columns>
+					</mx:AdvancedDataGrid>
+				
+				</s:VGroup>
+			</s:NavigatorContent>
+			<s:NavigatorContent  id="LandRecords" backgroundColor="haloSilver" label="LAND RECORDS">
+					<s:VGroup id="assesorVBox" width="100%" height="100%"  paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
+						<mx:Form width="100%" height="100%" fontSize="13" borderStyle="solid"  borderColor="#2D39E0" backgroundColor="#DDDDDD" backgroundAlpha=".7">
+							<mx:FormItem label="Name">
+								<s:Label id="lblPlanName" text="{txtPlanName}" />
+							</mx:FormItem>
+							<mx:FormItem label="Legal Date">
+								<s:Label id="lblLglDate" text="{txtLglDate}" />
+							</mx:FormItem>
+							<mx:FormItem label="County Recording">
+								<s:Label id="lblPCntyRecording" text="{txtPCntyRecording}" />
+							</mx:FormItem>
+							<mx:FormItem label="Survey Date">
+								<s:Label id="lblSurveyDate" text="{txtSurveyDate}" />
+							</mx:FormItem>
+							<mx:FormItem label="Surveyor">
+								<s:Label id="lblSurveyor" text="{txtSurveyor}" />
+							</mx:FormItem>
+							<mx:FormItem label="Company">
+								<s:Label id="lblCompany" text="{txtCompany}" />
+							</mx:FormItem>
+							<mx:FormItem label="Plan Residential Development">
+								<s:Label id="lblPResDevel" text="{txtPResDevel}" />
+							</mx:FormItem>
+							<mx:FormItem label="Description">
+								<s:TextArea id="taPDescription" text="{txtPDescription}" editable="false" heightInLines="5" widthInChars="15" borderVisible="false" contentBackgroundAlpha="0" />
+							</mx:FormItem>
+						</mx:Form>
+						<s:VGroup verticalAlign="bottom" width="100%" height="100%" fontSize="13">
+							<s:Label text="Parcels Selected = 2" fontSize="12"/>
+							<mx:AdvancedDataGrid width="100%" height="100%"  id="dgSubdiv" 
+												 horizontalScrollPolicy="auto" 
+												 verticalScrollPolicy="auto" 
+												 selectable="true"
+												 dataProvider="{arrcSubdiv}"
+												 mouseOver="dgSubdiv_mouseOverHandler(event)"
+												 mouseOut="dgSubdiv_mouseOutHandler(event)">
+								<mx:columns>
+									<mx:AdvancedDataGridColumn headerText="Map Name" dataField="Name" sortable="true" visible="true" />
+									<mx:AdvancedDataGridColumn headerText="Legal Date" sortCompareFunction="date_sortCompareFunc" dataField="LegalStartDate" sortable="true" visible="true" sortDescending="true" />
+									<mx:AdvancedDataGridColumn headerText="Area" dataField="StatedArea" sortable="true" visible="true" />
+									<mx:AdvancedDataGridColumn headerText="Historical" dataField="Historical" sortable="true" visible="true" />
+									<mx:AdvancedDataGridColumn headerText="Misclose" dataField="MiscloseDistance" sortable="true" visible="true" />
+									<mx:AdvancedDataGridColumn headerText="Max Dwelling Units" dataField="MaxDwellingUnits" sortable="true" visible="true" />
+									<mx:AdvancedDataGridColumn headerText="PlanID" dataField="PlanID" sortable="false" visible="false"  />
+									<mx:AdvancedDataGridColumn headerText="OBJECTID" dataField="OBJECTID" sortable="false" visible="false"  />
+								</mx:columns>
+							</mx:AdvancedDataGrid>
+							<s:Button id="btnLandRecsApp" click="btnLandRecsApp_clickHandler(event)" label="Land Records App"/>
+						</s:VGroup>			
+					</s:VGroup>
+			</s:NavigatorContent>	
+
+			<s:NavigatorContent id="Permits" backgroundColor="haloSilver" label="PERMITS"  show="Permits_showHandler(event)">
+				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
+					
+				
+					<mx:AdvancedDataGrid id="adgPermits" 
+										 width="100%" height="100%"  
+										 horizontalScrollPolicy="auto" 
+										 verticalScrollPolicy="auto" 
+										 selectable="true" 
+										 wordWrap="true"
+										 variableRowHeight="true"
+										 mouseOver="adgPermits_mouseOverHandler(event)"
+										 mouseOut="adgPermits_mouseOutHandler(event)">
+						<mx:dataProvider>
+							<mx:GroupingCollection2 id="gcPermits" source="{acGradingPermits}" >
+								<mx:grouping >
+									<mx:Grouping >
+										<mx:GroupingField name="PermitType" />
+									</mx:Grouping>
+								</mx:grouping>
+							</mx:GroupingCollection2>
+						</mx:dataProvider> 
+
+						<mx:columns>
+							<mx:AdvancedDataGridColumn headerText="Permit Type " dataField="PermitType" sortable="true" visible="true" width="200" />
+							<mx:AdvancedDataGridColumn headerText="Permit Year" dataField="PermitYear" sortable="true" visible="true" />
+							<mx:AdvancedDataGridColumn headerText="Permit Sequence" dataField="PermitSequence" sortable="true" visible="true" />
+							<mx:AdvancedDataGridColumn headerText="ObjectID" dataField="OBJECTID" visible="false" />
+						</mx:columns>
+					</mx:AdvancedDataGrid>
+				</s:VGroup>
+			</s:NavigatorContent>
+			
+			<s:NavigatorContent backgroundColor="haloSilver" id="AssessorInfo" label="ASSESSOR INFO">
+				<s:VGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
+					<mx:AdvancedDataGrid dataProvider="{arrcAddressRelatedToPoints}" width="100%" height="100"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+						<mx:columns>
+							<mx:AdvancedDataGridColumn dataField="gispub.GIS.hdl_TaxRec.SitusStreet" headerText="Site Address" sortable="true" visible="true" />
+						</mx:columns>
+					</mx:AdvancedDataGrid>
+
+					<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+
+						<mx:FormItem label="APN:">
+							<mx:Label  id="lblAPN" width="200" text="{myParcelCursor.current.APN}"/>
+						</mx:FormItem>
+						<mx:FormItem label="Owner Name:">
+							<s:TextArea heightInLines="2" editable="false" id="lblOwnerName" width="200" text="{myParcelCursor.current.OwnerName1}"  borderVisible="false" contentBackgroundAlpha="0.0"/>
+						</mx:FormItem>
+						<mx:FormItem label="Mail Street:">
+							<mx:Text id="mstreet" width="200" text="{myParcelCursor.current.MailStreet}"/>
+						</mx:FormItem>
+						<mx:FormItem label="Mail City:">
+							<mx:Text id="mcity" width="200" text="{myParcelCursor.current.MailCity}"/>
+						</mx:FormItem>
+						<mx:FormItem label="Mail State:">
+							<mx:Label id="mState" width="200" text="{myParcelCursor.current.MailState}"/>
+						</mx:FormItem>
+						<mx:FormItem label="Mail ZIP:" borderColor="#FFFFFF" >
+							<mx:Label id="mZIP" width="200" text="{myParcelCursor.current.MailZip}"/>
+						</mx:FormItem> 
+						<mx:FormItem label="Is Owner Occupied?" borderColor="#FFFFFF" >
+							<mx:Label id="mOcc" width="200" text="{myParcelCursor.current.AbsenteeFlag}"/>
+						</mx:FormItem> 
+						<EncComponents:FormNav id="FormNav1" cursor="{myParcelCursor}" arrayCol="{acParcelResults}"/>
+						
+
+					</mx:Form>
+					
+					<mx:AdvancedDataGrid dataProvider="{acHistoricParcels}" width="100%" height="100"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+						<mx:columns>
+							<mx:AdvancedDataGridColumn dataField="APN" headerText="Historic APN(s)" sortable="true" visible="true" />
+						</mx:columns>
+					</mx:AdvancedDataGrid>
+				</s:VGroup>
+			</s:NavigatorContent>
+			
+			
+			<s:NavigatorContent id="DistrictsServices" backgroundColor="haloSilver" label="DISTRICTS and SERVICES" >
+				
+				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
+						<EncComponents:DistractsServicesComponent  
+							mapset="{map}" 
+							graphLayer="{glDistrictsServices}" 
+							queryPoint="{mpIDPoint}"
+							width="100%"
+							height="100%"/>
+<!--					<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+						<mx:FormItem label="Community:">
+							<mx:Text id="community" width="200" text=""/>
+						</mx:FormItem>
+
+						<mx:FormItem label="Trash PickUp:">
+							<mx:Text id="txttrash" width="200" text=""/>
+						</mx:FormItem>
+						<mx:FormItem label="Street Sweeping:">
+							<mx:Label id="txtsweeping" width="200" text=""/>
+						</mx:FormItem>
+						<mx:FormItem label="Elementary School District:" borderColor="#FFFFFF">
+							<mx:Label id="txtdistricy" width="200" text=""/>
+						</mx:FormItem> 
+						<mx:FormItem label="Sewer District:">
+							<mx:Text id="txtsewer1" width="200" text=""/>
+						</mx:FormItem>
+						<mx:FormItem label="Water District:">
+							<mx:Text id="txtwaterD1" width="200" text=""/>
+						</mx:FormItem>
+						<mx:FormItem label="Census Tract/Block:">
+							<mx:Text id="txtcensus" width="200" text=""/>
+						</mx:FormItem>
+						<mx:FormItem label="General Plan Zoning:">
+							<mx:Text id="txtGPZoning" width="200" text=""/>
+						</mx:FormItem>
+						<mx:FormItem label="Thomas Bros. Page/Grid:">
+							<mx:Text id="txtThomasBros" width="200" text=""/>
+						</mx:FormItem>
+						<mx:Spacer height="20" />
+						<s:HGroup   verticalAlign="middle" width="100%" horizontalAlign="center">
+							<s:Button id="btnSchools" label="Schools"  />
+							<s:Button id="btnNearbyAmmenities" label="Nearby Amenities" />
+						</s:HGroup>
+					</mx:Form>-->
+					
+				</s:VGroup>
+			</s:NavigatorContent>
+			
+			<s:NavigatorContent id="Utilities" backgroundColor="haloSilver" label="SEWER">
+				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
+
+						<mx:AdvancedDataGrid id="adgDischargePoints" 
+											 dataProvider="{arrcSewerEDU}" 
+											 mouseOver="adgDischargePermits_mouseOverHandler(event)"
+											 width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+							<mx:columns>
+								<mx:AdvancedDataGridColumn headerText="FacilityID" dataField="FacilityID" sortable="true" visible="true" />
+								<mx:AdvancedDataGridColumn dataField="DischargePermitFacilityID" visible="true"/>
+								<mx:AdvancedDataGridColumn headerText="EDUs" dataField="EDUTHISPOINT" sortable="true" visible="true" />
+								
+							</mx:columns>
+						</mx:AdvancedDataGrid>
+						<EncComponents:RowColorDataGrid id="adgDischargePermits"  rowColorFunction="calcDischargePermitRowColor"  dataProvider="{arrcSewerPermits}" width="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true" >
+							<EncComponents:columns>
+								<mx:AdvancedDataGridColumn headerText="FacilityID" dataField="FacilityID" sortable="true" visible="true" />
+								<mx:AdvancedDataGridColumn headerText="Permit Prefix" dataField="PERMITPREFIX" sortable="true" visible="true" />
+								<mx:AdvancedDataGridColumn headerText="Permit Year" dataField="PERMITYEAR" sortable="true" visible="true" />
+								<mx:AdvancedDataGridColumn headerText="Permit Sequence" dataField="PERMITSEQUENCE" sortable="true" visible="true" />
+								<mx:AdvancedDataGridColumn headerText="EDUs" dataField="EDUTHISPERMIT" sortable="true" visible="true" />
+							</EncComponents:columns>
+						</EncComponents:RowColorDataGrid>
+
+					<mx:Form  width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+						<mx:FormItem label="Sewer District:">
+							<mx:Text id="sewer" width="200" text="{txtSewerDist}"/>
+						</mx:FormItem>
+
+						<mx:FormItem label="Sewer Reimbursement District:">
+							<mx:Text id="sewerRD" width="200" text="{txtSewerReimbursement}"/>
+						</mx:FormItem>
+					</mx:Form>
+				</s:VGroup>
+			</s:NavigatorContent>
+			
+			<s:NavigatorContent id="ncWater" backgroundColor="haloSilver" label="WATER">
+				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
+					<mx:Form  width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+						<mx:FormItem label="Water District:">
+							<mx:Text id="waterD" width="200" text="{txtWaterDist}"/>
+						</mx:FormItem>
+						<mx:FormItem label="Water Meter Cycle Area:">
+							<mx:Text id="sewerMCA" width="200" text="{txtWaterCycle}"/>
+						</mx:FormItem>
+
+						<mx:FormItem label="Uses Recycled Water?">
+							<mx:Text id="waterRecycled" width="200" text="{txtWaterRecycled}"/>
+						</mx:FormItem>
+						<s:Label id="lblWDWarning" text="Meter data is only available for SDWD" visible="false" />
+						<mx:FormItem label="Water Meter Number(s):" width="350" height="100%">
+							<mx:AdvancedDataGrid width="100%" height="100%" dataProvider="{arrWaterMeters}"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+								<mx:columns>
+									<mx:AdvancedDataGridColumn dataField="MeterNumber" headerText="Meter No." sortable="true" visible="true" />
+								</mx:columns>
+							</mx:AdvancedDataGrid>
+						</mx:FormItem>
+					</mx:Form>
+				</s:VGroup>
+			</s:NavigatorContent>
+			
+			<s:NavigatorContent id="ncStormWater" backgroundColor="haloSilver" label="STORMWATER">
+				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
+					<s:Label text="BMPs" />
+					<mx:AdvancedDataGrid width="95%" height="100%"  
+										 horizontalScrollPolicy="off"
+										 verticalScrollPolicy="auto" selectable="true"
+										 dataProvider="{arrcBMPs}">
+						<mx:columns>
+							<mx:AdvancedDataGridColumn headerText="BMP Type" dataField="Type" sortable="true" visible="true" width="{spMain.width / 4}"/>
+							<mx:AdvancedDataGridColumn headerText="BMP Location" dataField="Location" sortable="true" visible="true" width="{spMain.width / 2}" />
+							<mx:AdvancedDataGridColumn headerText="Covenant Number" dataField="CovenantNumber" sortable="true" visible="true" width="{spMain.width / 4}" />
+						</mx:columns>
+					</mx:AdvancedDataGrid>
+					<mx:AdvancedDataGrid width="95%" height="100%"  
+										 horizontalScrollPolicy="off"
+										 verticalScrollPolicy="auto" selectable="true"
+										 dataProvider="{acBMPPermits}">
+						<mx:columns> 
+							<mx:AdvancedDataGridColumn headerText="Project Name" dataField="ProjectName" sortable="true" visible="true"/>
+							<mx:AdvancedDataGridColumn headerText="Priority" dataField="Priority" sortable="true" visible="true" />
+						</mx:columns>
+					</mx:AdvancedDataGrid>
+					<mx:Form  width="100%" height="10%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+						<mx:FormItem label="Priority Project Status:" width="350" height="100">
+							<mx:Text id="lblpermitpriority" text="{strPermitProritu}"/>
+						</mx:FormItem>
+					</mx:Form>
+				</s:VGroup>
+					
+			</s:NavigatorContent>	
+			
+			<s:NavigatorContent id="Fire" backgroundColor="haloSilver" label="PUBLIC SAFETY" >
+				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
+					<mx:Form  width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+
+	
+						<mx:Spacer height="10"/>
+						<mx:FormItem label="Public Safety Grid Sheet:">
+							<mx:Text id="fireGrid" width="200" text="{txtFireGrid}"/>
+						</mx:FormItem>
+						<mx:FormItem label="Fire PrePlan:">
+							<mx:Text id="firePP" width="200" text="{txtFirePrePlan}"/>
+						</mx:FormItem>
+						<mx:FormItem label="High Fire Hazard?">
+							<mx:Text id="fireHH" width="200" text="{txtFireHH}"/>
+						</mx:FormItem>
+						<mx:FormItem label="Sheriff Evacuation Area:">
+							<mx:Text id="EvacArea" width="200" text="{txtEvacArea}"/>
+						</mx:FormItem>
+						<mx:FormItem label="Sheriff Knox Box:">
+							<mx:Text id="KnoxBox" width="200" text="{txtSheriffKnox}"/>
+						</mx:FormItem>
+						<mx:FormItem label="Fire Station(s) within 3.5">
+						</mx:FormItem>
+						<mx:FormItem label=" Minute Response Zone:" width="350" height="100">
+							<mx:AdvancedDataGrid dataProvider="{arr3MinZone}" width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+								<mx:columns>
+									<mx:AdvancedDataGridColumn dataField="FireStation" headerText="Station Number" sortable="true" visible="true" />
+								</mx:columns>
+							</mx:AdvancedDataGrid>
+						</mx:FormItem>
+					</mx:Form>
+				</s:VGroup>
+			</s:NavigatorContent>
+			
+			<s:NavigatorContent id="Zoning" backgroundColor="haloSilver" label="ZONING">
+				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
+					<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+					
+					<mx:FormItem label="General Plan Zoning:">
+						<mx:Text id="zoneGP" width="100" text="{txtGPZone}"/>
+					</mx:FormItem>
+					<mx:FormItem label="Base Zoning:">
+						<mx:Text id="zoneBP" width="100" text="{txtBaseZoning}"/>
+					</mx:FormItem>
+					<mx:FormItem label="Specific Plan Zoning:">
+						<mx:Text id="zoneSP" width="100" text="{txtSpecificZone}"/>
+					</mx:FormItem>
+					<s:VGroup   verticalAlign="middle" width="90%" horizontalAlign="center">
+						<s:Button id="btnZoningDetails" label="For more detailed information, click here" click="btnZoningDetails_clickHandler(event)"/>
+					</s:VGroup>
+					</mx:Form>
+			
+				</s:VGroup>
+			</s:NavigatorContent>
+			
+<!--			<s:NavigatorContent id="NearbyAmenities" backgroundColor="haloSilver" label="NEARBY AMENITIES" >
+				<s:VGroup  width="100%" height="100%"   paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
+					<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+					
+					<mx:FormItem label="Parks and Beaches within 1 mile:" width="350" height="100">
+						<mx:AdvancedDataGrid width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+							<mx:columns>
+								<mx:AdvancedDataGridColumn headerText="Park Name" sortable="true" visible="true" />
+							</mx:columns>
+						</mx:AdvancedDataGrid>
+					</mx:FormItem>
+					<mx:FormItem label="Trailes within 1 mile:" width="350" height="100">
+						<mx:AdvancedDataGrid width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+							<mx:columns>
+								<mx:AdvancedDataGridColumn headerText="Trail Name" sortable="true" visible="true" />
+							</mx:columns>
+						</mx:AdvancedDataGrid>
+					</mx:FormItem>
+					<mx:FormItem label="Schools within 1 mile:" width="350" height="100">
+						<mx:AdvancedDataGrid width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+							<mx:columns>
+								<mx:AdvancedDataGridColumn headerText="School Name" sortable="true" visible="true" />
+							</mx:columns>
+						</mx:AdvancedDataGrid>
+					</mx:FormItem>
+					<mx:FormItem label="Points of Interest within 1 mile:" width="350" height="100">
+						<mx:AdvancedDataGrid width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+							<mx:columns>
+								<mx:AdvancedDataGridColumn headerText="POI Name" sortable="true" visible="true" />
+							</mx:columns>
+						</mx:AdvancedDataGrid>
+					</mx:FormItem>
+					</mx:Form>
+				</s:VGroup>
+			</s:NavigatorContent>-->
+		</mx:ViewStack>
+
+	</EncComponents:SlidingPanel>
+		
+	</s:HGroup>
+
+		
+	<s:VGroup  width="100%" height="100%" id="appMain" gap="1">
+	
+		<s:VGroup id="header"  width="{parentApplication.width}">
+			<mx:HBox horizontalGap="0" width="100%" id="hbHeader"> 
+				<mx:Image height="100%" maintainAspectRatio="false" source="@Embed('/SiteProfiler/src/assets/icons/City Logo_Banner.JPG')"/>
+				<mx:Image width="100%" source="@Embed('/SiteProfiler/src/assets/icons//BkGd.gif')" maintainAspectRatio="false" id="imgHeader2"/>
+			</mx:HBox>
+				<s:ButtonBar id="tabBar" buttonMode="true" width="100%" height="30"
+									fontSize="12" fontFamily="arial" fontWeight="bold" 
+									dataProvider="{viewStackSiteProfiler}"
+									creationComplete="tabBar_creationComplete();" 
+									change="tabBar_changeHandler(event)"  />
+	
+		</s:VGroup>	
+
+
+		<s:Group width="{parentApplication.width}" height="100%" id="cnvMap">
+			
+			<esri:Map id="map" logoVisible="false" rubberbandZoomEnabled="true"  mapClick="onMapClicked(event)" extentChange="onExtentChanged(event)" 
+				panEnabled="true" openHandCursorVisible="false"   >
+				<esri:lods>
+					<esri:LOD level="11" resolution="76.4370282850732" scale="288895.277144" />
+					<esri:LOD level="12" resolution="38.2185141425366" scale="144447.638572"/>
+					<esri:LOD level="13" resolution="19.1092570712683" scale="72223.819286"/>
+					<esri:LOD level="14" resolution="9.55462853563415" scale="36111.909643"/>
+					<esri:LOD level="15" resolution="6.3500127000254" scale="24000"/>
+					<esri:LOD level="16" resolution="4.77731426794937" scale="18055.954822"/>
+					<esri:LOD level="18" resolution="2.38865713397468" scale="9027.977411"/>
+					<esri:LOD level="19" resolution="1.19432856685505" scale="4513.988705"/>
+					<esri:LOD level="21" resolution="0.63500127000254" scale="2400"/>
+					<esri:LOD level="23" resolution="0.31750063500127" scale="1200"/>
+					<esri:LOD level="24" resolution="0.158750317500635" scale="600"/>
+					<esri:LOD level="25" resolution="0.0793751587503175" scale="300"/>
+				</esri:lods> 				
+<!--				<esri:extent>                
+					<esri:Extent xmin="-13057667" ymin="3851383" xmax="-13023997" ymax="3872881">
+						<esri:SpatialReference wkid="102100"/> 
+					</esri:Extent>
+				</esri:extent> -->
+				<esri:ArcGISTiledMapServiceLayer id="ShadedRelief"   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/unsecured/Shaded_Relief_2009/MapServer" visible="true" alpha="0"/>
+				<esri:ArcGISTiledMapServiceLayer id="Imagery"   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/unsecured/Imagery_2009_Web/MapServer" visible="true" alpha="1"/>
+				<esri:ArcGISTiledMapServiceLayer id="Basemap" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/unsecured/Basemap/MapServer" visible="true"/>
+				<esri:ArcGISTiledMapServiceLayer id="BasemapPlus" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/unsecured/BasemapPlus/MapServer" visible="false" load="BasemapPlus_loadHandler(event)"/>
+				<esri:GraphicsLayer id="graphicsLayer" graphicProvider="{queryParcels.executeLastResult.features}" visible="true"/>
+				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://gisweb:9231/internal/rest/services/Secured/SiteProfiler/MapServer" 
+												   visible="true" load="Addresses_loadHandler(event)" 
+												   imageFormat="png32" />
+				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/MapServer" 
+												   visible="false" 
+												   imageFormat="png32" />
+				<esri:GraphicsLayer id="glDistrictsServices" visible="true"/>
+				<esri:GraphicsLayer id="glAddress" graphicProvider="{arrayAddresses}" visible="true"/>
+				<esri:GraphicsLayer id="glSubdivision" graphicProvider="{arraySubdivResult}" visible="false"/>
+				<esri:GraphicsLayer id="glPermits" graphicProvider="{arrayPermits}" visible="false" alpha=".66" symbol="{symTransparent}"/>
+			</esri:Map>
+		</s:Group>
+
+	<mx:HBox backgroundColor="0xffffff" backgroundAlpha=".7" width="100%" height="8%" horizontalScrollPolicy="off" verticalScrollPolicy="off" fontSize="10" id="hbTools">
+					
+		<mx:HBox borderColor="0xffffff" paddingLeft="7" paddingRight="7" paddingBottom="5" paddingTop="5" width="30%" height="100%" id="hbxAddress">
+			            
+						<mx:Label text="Find:" fontWeight="bold" fontSize="13" width="42">
+							
+						</mx:Label>
+			<s:VGroup>
+				<s:TextInput id="txtFindSite" fontSize="12" fontStyle="italic" 
+							 toolTip="type address or parcel number" text="" 
+							 width="216" 
+							 enter="onNewSearch(event)"
+							 focusIn="txtFindSite_focusInHandler(event)"/>
+				<s:Label id="lblSelectedAddress" text="Selected: " fontSize="12"/>
+			</s:VGroup>
+
+			            <mx:Button id="btnGo" fontSize="12"
+			                label="Go" 
+			                click="onNewSearch(event)"/>
+			            <mx:VBox height="100%" horizontalAlign="center" verticalGap="0">
+			            	            <mx:Label text="e.g: 505 S Vulcan Ave" textAlign="left" width="100%" fontSize="9"/>
+			            	            <mx:Label text="or"/>
+			            	            <mx:Label text="2580904300"/>
+			            </mx:VBox>
+		</mx:HBox>
+			
+        <mx:HBox borderColor="0xffffff"  paddingLeft="5" paddingRight="5" paddingBottom="5" paddingTop="5"  width="70%" id="hbxTools">
+    			<s:ButtonBar id="tbb" height="32"
+    				creationComplete="tbb.selectedIndex = 2" 
+    				valueCommit="if (tbb.selectedIndex == -1) { navToolbar.deactivate() }"
+    				change="navitemClickHandler(event)"  
+					skinClass="skins.IconButtonBarSkin" 
+    				buttonMode="true" > 
+					<s:dataProvider>
+						<mx:ArrayCollection id="acNavTool" >                
+							<fx:Object data="Zoom In"  imageIcon="@Embed(source='assets/icons/i_zoomin.png')" label="Click or drag on map to zoom in"/>
+							<fx:Object data="Zoom Out" imageIcon="@Embed(source='assets/icons/i_zoomout.png')" label="Click or drag on map to zoom out"/>
+							<fx:Object data="Identify" imageIcon="@Embed(source='assets/icons/pan_identify.png')" label="Click on a site to get info on it or drag on map to pan around"/>
+						</mx:ArrayCollection> 
+					</s:dataProvider>
+       
+    			 </s:ButtonBar>        
+    			 <mx:ControlBar horizontalGap="0" paddingBottom="0" paddingTop="0" buttonMode="true">           
+    			 	<mx:Button  icon="@Embed(source='assets/icons/i_zoomprevious.png')" 
+    			 		click="navToolbar.zoomToPrevExtent()"    
+    			 		enabled="{!navToolbar.isFirstExtent}"
+    			 		toolTip="Zoom to the previous extent"
+    			 		height="32" 
+    			 		width="32"  />            
+    			   	<mx:Button icon="@Embed(source='assets/icons/i_zoomnext.png')" 
+    			   		click="navToolbar.zoomToNextExtent()" 
+    			   		enabled="{!navToolbar.isLastExtent}"
+    			   		toolTip="Zoom to the next extent"
+						height="32" 
+    			   		width="32"/>        
+    			 </mx:ControlBar>        
+    			 <mx:Button icon="@Embed(source='assets/icons/i_zoomfull.png')" 
+    			   		click="map.zoomToInitialExtent()" 
+    			   		toolTip="Zoom all the way out" 
+    			   		height="32" 
+    			   		width="32"/>
+				<s:Button id="btnzoomSelected"
+						  label="Zoom"
+						  height="32" 
+						  width="32"
+						  skinClass="{skins.IconButtonZoomPrevious}" click="zoomSelected_clickHandler(event)"
+						  toolTip="Zoom to Selected Site">
+				</s:Button>
+			
+			<EncComponents:encToolBar id="EncTools2" includeInLayout="false" 
+									  map="{map}" parentContainer="{spContainer}" click="{tbb.selectedIndex = -1}"
+									  geometryServiceap="{geometry1}" slidingPanel="{spMain}"/>
+			
+			<mx:Spacer width="40"/>
+    		<mx:Label text="Zoom To:" fontSize="12" fontWeight="bold"/>
+
+    		<EncComponents:cboBookmarks id="cboBookmarks" change="onBookMarkChange(event)" toolTip="Select a location from the drop down to zoom to it" />
+			<mx:Button label="Help" id="btnHelp" fontSize="12" toolTip="Help"  visible="true" click="btnHelp_clickHandler(event)"/>	
+    		<mx:Spacer width="100%"/>
+    		
+		</mx:HBox>
+	</mx:HBox>
+
+	</s:VGroup>
+
+
+</s:Group>

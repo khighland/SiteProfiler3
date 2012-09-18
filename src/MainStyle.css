@@ -1,0 +1,81 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace esri "http://www.esri.com/2008/ags";
+@namespace EncComponents "EncComponents.*";
+@namespace Esricomponents "com.esri.ags.components.*";
+mx|LinkButton
+{
+	themeColor: #6ABBEE;
+}
+
+EncComponents|BasemapTransparancyControl
+{
+	color: 	#6ABBEE;
+	
+}
+
+esri|Map
+{
+	navigation-style-name: Navigation;
+}
+
+esri|Navigation
+{
+	skinClass: ClassReference("EncComponents.EncNavigationBar");
+	top: 35;
+    left: NaN;
+    right: 6;
+}
+
+EncComponents|ApplicationJumpSpark
+{
+	backgroundColor:#FCFCFC ;
+	backgroundAlpha:0.0;
+	
+}
+
+
+
+    
+
+
+.MyTabBarStyle
+{
+	tabHeight: 28;
+	cornerRadius: 8;
+	horizontalGap: 2;
+	horizontalAlign: right;
+	backgroundAlpha: 1;
+	backgroundColor: #bac19f;
+	borderStyle: none;
+	borderThickness: 20;
+	tab-style-name: myTabStyle;
+	
+	
+}
+
+.myTabStyle
+{
+	fillColors: #bac19f, #b1c65c;
+  	backgroundColor: #bac19f;
+   	borderColor: #87c408;
+  	themeColor: #a5d414;
+  	border-thickness: 3;
+  	border-color: #035c33;
+  	corner-radius: 9;
+	tabStyleName: tabBarTab;
+	button-style-name: myTabButton;
+	
+  	
+
+}
+
+.myTabButton
+{
+	
+}
+.tabBarTab
+{
+	
+}
