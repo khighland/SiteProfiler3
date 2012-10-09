@@ -128,7 +128,7 @@
 			
 			[Bindable]
 			private var acGradingPermits:ArrayCollection = new ArrayCollection;
-			
+			//test edit delete
 //Group of variable to hold values that results panel items will bind too
 			[Bindable]
 			private var txtPlanName:String;
@@ -2405,7 +2405,7 @@
 											  geometryServiceap="{geometry1}" slidingPanel="{spMain}"/>
 					
 					<mx:Spacer width="40"/>
-		    		<mx:Label text="Zoom To:" fontSize="12" fontWeight="bold"/>
+		    		<s:Label text="Zoom To:" fontSize="12" fontWeight="bold"/>
 		
 		    		<EncComponents:cboBookmarks id="cboBookmarks" change="onBookMarkChange(event)" toolTip="Select a location from the drop down to zoom to it" />
 					<mx:Button label="Help" id="btnHelp" fontSize="12" toolTip="Help"  visible="true" click="btnHelp_clickHandler(event)"/>	
