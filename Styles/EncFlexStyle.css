@@ -2,9 +2,9 @@
 @namespace mx "library://ns.adobe.com/flex/mx";
 @namespace s "library://ns.adobe.com/flex/spark";
 @namespace esri "http://www.esri.com/2008/ags";
-@namespace EncComponents "EncComponents.*";
+@namespace EncComponents "LocalComponents.*";
 
-EncComponents|SuperPanel
+/*EncComponents|SuperPanel
 {
 	resize-grip-skin:              Embed(source="/../assets/icons/resizeHandler.png");
 	
@@ -29,10 +29,10 @@ EncComponents|SuperPanel
 	
 	
 	
-}
+}*/
 .closeButton
 {
-	icon:                         Embed(source="/../assets/icons/icon_close_up.png");
+	icon:                         Embed(source="/../src/assets/icons/clear.png");
 	up-icon:                     Embed(source="/../assets/icons/icon_close_up.png");
 	over-icon:                     Embed(source="/../assets/icons/icon_close_over.png");
 	down-icon:                     Embed(source="/../assets/icons/icon_close_down.png");

@@ -16,6 +16,9 @@
 	<fx:Script>
 		<![CDATA[
 			import EncComponents.SuperPanel;
+			import EncComponents.WebForm;
+			import EncComponents.helperClass;
+			import EncComponents.splashScreen;
 			
 			import com.esri.ags.FeatureSet;
 			import com.esri.ags.Graphic;
@@ -268,6 +271,7 @@
 			var local_data:SharedObject = SharedObject.getLocal ("user_data");
 			if (local_data.size == 0)
 			{
+				
 				var screen:EncComponents.splashScreen = new splashScreen;
 				PopUpManager.addPopUp( screen, this,true);
 				PopUpManager.centerPopUp(screen)
@@ -831,7 +835,7 @@
 					{
 						strPermitProritu = result.feature.attributes.SUSMPPriorityLevel;
 					}
-					else if (result.layerName == "Sewer District")
+					else if (result.layerName == "Sewer Division")
 					{
 						txtSewerDist = result.feature.attributes.NameFull;
 					}
@@ -2268,8 +2272,8 @@
 	
 		<s:VGroup id="header"  width="{parentApplication.width}">
 			<mx:HBox horizontalGap="0" width="100%" id="hbHeader"> 
-				<mx:Image height="100%" maintainAspectRatio="false" source="@Embed('/SiteProfiler/src/assets/icons/City Logo_Banner.JPG')"/>
-				<mx:Image width="100%" source="@Embed('/SiteProfiler/src/assets/icons//BkGd.gif')" maintainAspectRatio="false" id="imgHeader2"/>
+				<mx:Image height="100%" maintainAspectRatio="false" source="@Embed('/../src/assets/icons/City Logo_Banner.JPG')"/>
+				<mx:Image width="100%" source="@Embed('/../src/assets/icons/BkGd.gif')" maintainAspectRatio="false" id="imgHeader2"/>
 			</mx:HBox>
 				<s:ButtonBar id="tabBar" buttonMode="true" width="100%" height="30"
 									fontSize="12" fontFamily="arial" fontWeight="bold" 
@@ -2321,90 +2325,94 @@
 			</esri:Map>
 		</s:Group>
 
-	<mx:HBox backgroundColor="0xffffff" backgroundAlpha=".7" width="100%" height="8%" horizontalScrollPolicy="off" verticalScrollPolicy="off" fontSize="10" id="hbTools">
+		
+		<s:BorderContainer width="100%" backgroundAlpha=".7" borderColor="black"
+							   borderStyle="inset">
+				<s:backgroundFill>
+					<s:LinearGradient rotation="90">
+						<s:GradientEntry color="white"/>
+						<s:GradientEntry color="gray"/>
+					</s:LinearGradient>
+				</s:backgroundFill>
+			<s:HGroup  height="8%"  width="{parentApplication.width}"  fontSize="10" id="hbTools" gap="10" >		  	
+				<s:HGroup  paddingLeft="7" paddingRight="7" paddingBottom="5" paddingTop="5" width="30%" height="100%" id="hbxAddress">
+					            
+					<s:Label text="Find:" fontWeight="bold" fontSize="13" width="42"/>
+					<s:VGroup>
+						<s:TextInput id="txtFindSite" fontSize="12" fontStyle="italic" 
+									 toolTip="type address or parcel number" text="" 
+									 width="216" 
+									 enter="onNewSearch(event)"
+									 focusIn="txtFindSite_focusInHandler(event)"/>
+						<s:Label id="lblSelectedAddress" text="Selected: " fontSize="12"/>
+					</s:VGroup>
+		
+					            <mx:Button id="btnGo" fontSize="12"
+					                label="Go" 
+					                click="onNewSearch(event)"/>
+					            <s:VGroup height="100%" horizontalAlign="center" gap="0">
+					            	            <mx:Label text="e.g: 505 S Vulcan Ave" textAlign="left" width="100%" fontSize="9"/>
+					            	            <mx:Label text="or"/>
+					            	            <mx:Label text="2580904300"/>
+					            </s:VGroup>
+				</s:HGroup>
 					
-		<mx:HBox borderColor="0xffffff" paddingLeft="7" paddingRight="7" paddingBottom="5" paddingTop="5" width="30%" height="100%" id="hbxAddress">
-			            
-						<mx:Label text="Find:" fontWeight="bold" fontSize="13" width="42">
-							
-						</mx:Label>
-			<s:VGroup>
-				<s:TextInput id="txtFindSite" fontSize="12" fontStyle="italic" 
-							 toolTip="type address or parcel number" text="" 
-							 width="216" 
-							 enter="onNewSearch(event)"
-							 focusIn="txtFindSite_focusInHandler(event)"/>
-				<s:Label id="lblSelectedAddress" text="Selected: " fontSize="12"/>
-			</s:VGroup>
-
-			            <mx:Button id="btnGo" fontSize="12"
-			                label="Go" 
-			                click="onNewSearch(event)"/>
-			            <mx:VBox height="100%" horizontalAlign="center" verticalGap="0">
-			            	            <mx:Label text="e.g: 505 S Vulcan Ave" textAlign="left" width="100%" fontSize="9"/>
-			            	            <mx:Label text="or"/>
-			            	            <mx:Label text="2580904300"/>
-			            </mx:VBox>
-		</mx:HBox>
-			
-        <mx:HBox borderColor="0xffffff"  paddingLeft="5" paddingRight="5" paddingBottom="5" paddingTop="5"  width="70%" id="hbxTools">
-    			<s:ButtonBar id="tbb" height="32"
-    				creationComplete="tbb.selectedIndex = 2" 
-    				valueCommit="if (tbb.selectedIndex == -1) { navToolbar.deactivate() }"
-    				change="navitemClickHandler(event)"  
-					skinClass="skins.IconButtonBarSkin" 
-    				buttonMode="true" > 
-					<s:dataProvider>
-						<mx:ArrayCollection id="acNavTool" >                
-							<fx:Object data="Zoom In"  imageIcon="@Embed(source='assets/icons/i_zoomin.png')" label="Click or drag on map to zoom in"/>
-							<fx:Object data="Zoom Out" imageIcon="@Embed(source='assets/icons/i_zoomout.png')" label="Click or drag on map to zoom out"/>
-							<fx:Object data="Identify" imageIcon="@Embed(source='assets/icons/pan_identify.png')" label="Click on a site to get info on it or drag on map to pan around"/>
-						</mx:ArrayCollection> 
-					</s:dataProvider>
-       
-    			 </s:ButtonBar>        
-    			 <mx:ControlBar horizontalGap="0" paddingBottom="0" paddingTop="0" buttonMode="true">           
-    			 	<mx:Button  icon="@Embed(source='assets/icons/i_zoomprevious.png')" 
-    			 		click="navToolbar.zoomToPrevExtent()"    
-    			 		enabled="{!navToolbar.isFirstExtent}"
-    			 		toolTip="Zoom to the previous extent"
-    			 		height="32" 
-    			 		width="32"  />            
-    			   	<mx:Button icon="@Embed(source='assets/icons/i_zoomnext.png')" 
-    			   		click="navToolbar.zoomToNextExtent()" 
-    			   		enabled="{!navToolbar.isLastExtent}"
-    			   		toolTip="Zoom to the next extent"
-						height="32" 
-    			   		width="32"/>        
-    			 </mx:ControlBar>        
-    			 <mx:Button icon="@Embed(source='assets/icons/i_zoomfull.png')" 
-    			   		click="map.zoomToInitialExtent()" 
-    			   		toolTip="Zoom all the way out" 
-    			   		height="32" 
-    			   		width="32"/>
-				<s:Button id="btnzoomSelected"
-						  label="Zoom"
-						  height="32" 
-						  width="32"
-						  skinClass="{skins.IconButtonZoomPrevious}" click="zoomSelected_clickHandler(event)"
-						  toolTip="Zoom to Selected Site">
-				</s:Button>
-			
-			<EncComponents:encToolBar id="EncTools2" includeInLayout="false" 
-									  map="{map}" parentContainer="{spContainer}" click="{tbb.selectedIndex = -1}"
-									  geometryServiceap="{geometry1}" slidingPanel="{spMain}"/>
-			
-			<mx:Spacer width="40"/>
-    		<mx:Label text="Zoom To:" fontSize="12" fontWeight="bold"/>
-
-    		<EncComponents:cboBookmarks id="cboBookmarks" change="onBookMarkChange(event)" toolTip="Select a location from the drop down to zoom to it" />
-			<mx:Button label="Help" id="btnHelp" fontSize="12" toolTip="Help"  visible="true" click="btnHelp_clickHandler(event)"/>	
-    		<mx:Spacer width="100%"/>
-    		
-		</mx:HBox>
-	</mx:HBox>
-
+		        <s:HGroup   paddingLeft="5" paddingRight="5" paddingBottom="5" paddingTop="5"  width="70%" id="hbxTools">
+		    			<s:ButtonBar id="tbb" height="32"
+		    				creationComplete="tbb.selectedIndex = 2" 
+		    				valueCommit="if (tbb.selectedIndex == -1) { navToolbar.deactivate() }"
+		    				change="navitemClickHandler(event)"  
+							skinClass="skins.IconButtonBarSkin" 
+		    				buttonMode="true" > 
+							<s:dataProvider>
+								<mx:ArrayCollection id="acNavTool" >                
+									<fx:Object data="Zoom In"  imageIcon="@Embed(source='assets/icons/i_zoomin.png')" label="Click or drag on map to zoom in"/>
+									<fx:Object data="Zoom Out" imageIcon="@Embed(source='assets/icons/i_zoomout.png')" label="Click or drag on map to zoom out"/>
+									<fx:Object data="Identify" imageIcon="@Embed(source='assets/icons/pan_identify.png')" label="Click on a site to get info on it or drag on map to pan around"/>
+								</mx:ArrayCollection> 
+							</s:dataProvider>
+		       
+		    			 </s:ButtonBar>        
+		    			 <mx:ControlBar horizontalGap="0" paddingBottom="0" paddingTop="0" buttonMode="true">           
+		    			 	<mx:Button  icon="@Embed(source='assets/icons/i_zoomprevious.png')" 
+		    			 		click="navToolbar.zoomToPrevExtent()"    
+		    			 		enabled="{!navToolbar.isFirstExtent}"
+		    			 		toolTip="Zoom to the previous extent"
+		    			 		height="32" 
+		    			 		width="32"  />            
+		    			   	<mx:Button icon="@Embed(source='assets/icons/i_zoomnext.png')" 
+		    			   		click="navToolbar.zoomToNextExtent()" 
+		    			   		enabled="{!navToolbar.isLastExtent}"
+		    			   		toolTip="Zoom to the next extent"
+								height="32" 
+		    			   		width="32"/>        
+		    			 </mx:ControlBar>        
+		    			 <mx:Button icon="@Embed(source='assets/icons/i_zoomfull.png')" 
+		    			   		click="map.zoomToInitialExtent()" 
+		    			   		toolTip="Zoom all the way out" 
+		    			   		height="32" 
+		    			   		width="32"/>
+						<s:Button id="btnzoomSelected"
+								  label="Zoom"
+								  height="32" 
+								  width="32"
+								  skinClass="{skins.IconButtonZoomPrevious}" click="zoomSelected_clickHandler(event)"
+								  toolTip="Zoom to Selected Site">
+						</s:Button>
+					
+					<EncComponents:encToolBar id="EncTools2" includeInLayout="false"
+											  map="{map}" parentContainer="{spContainer}" click="{tbb.selectedIndex = -1}"
+											  geometryServiceap="{geometry1}" slidingPanel="{spMain}"/>
+					
+					<mx:Spacer width="40"/>
+		    		<mx:Label text="Zoom To:" fontSize="12" fontWeight="bold"/>
+		
+		    		<EncComponents:cboBookmarks id="cboBookmarks" change="onBookMarkChange(event)" toolTip="Select a location from the drop down to zoom to it" />
+					<mx:Button label="Help" id="btnHelp" fontSize="12" toolTip="Help"  visible="true" click="btnHelp_clickHandler(event)"/>	
+		    		<mx:Spacer width="100%"/>
+		    		
+				</s:HGroup>
+			</s:HGroup>
+		</s:BorderContainer>
 	</s:VGroup>
-
-
 </s:Group>
