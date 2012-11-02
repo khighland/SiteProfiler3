@@ -1742,9 +1742,14 @@
 		y="{header.height + 5}"
 		x= "{appMain.width - 300}"
 		BMLayer="{basemapLayer}"
-		BMPlusLayer="{basemapPlusLayer}" >
+		BMPlusLayer="{basemapPlusLayer}" />
 		
-	</EncComponents:BasemapTransparancyControl>
+	<EncComponents:encToolBar id="EncTools2"
+							  map="{map}" parentContainer="{spContainer}" click="{tbb.selectedIndex = -1}"
+							  geometryServiceap="{geometry1}" slidingPanel="{spMain}" clipAndEnableScrolling="false"
+							  bottom="{parentApplication.bottom + 30}" x="{hbxAddress.width + tbb.width + 188 }"
+							  buttons="[btnTOC, btnGoogle, btnDraw, btnProject, btnGetElevation, btnProfileTool, btnGeoDocs, btnSSRS]"/>
+	
 	<s:HGroup id="spContainer" left="0"
 			  y="{basmapControl1.y}"
 			  width="100%">
@@ -2334,36 +2339,37 @@
 						<s:GradientEntry color="gray"/>
 					</s:LinearGradient>
 				</s:backgroundFill>
-			<s:HGroup  height="8%"  width="{parentApplication.width}"  fontSize="10" id="hbTools" gap="10" >		  	
-				<s:HGroup  paddingLeft="7" paddingRight="7" paddingBottom="5" paddingTop="5" width="30%" height="100%" id="hbxAddress">
-					            
-					<s:Label text="Find:" fontWeight="bold" fontSize="13" width="42"/>
-					<s:VGroup>
-						<s:TextInput id="txtFindSite" fontSize="12" fontStyle="italic" 
-									 toolTip="type address or parcel number" text="" 
-									 width="216" 
-									 enter="onNewSearch(event)"
-									 focusIn="txtFindSite_focusInHandler(event)"/>
-						<s:Label id="lblSelectedAddress" text="Selected: " fontSize="12"/>
-					</s:VGroup>
-		
-					            <mx:Button id="btnGo" fontSize="12"
-					                label="Go" 
-					                click="onNewSearch(event)"/>
-					            <s:VGroup height="100%" horizontalAlign="center" gap="0">
-					            	            <mx:Label text="e.g: 505 S Vulcan Ave" textAlign="left" width="100%" fontSize="9"/>
-					            	            <mx:Label text="or"/>
-					            	            <mx:Label text="2580904300"/>
-					            </s:VGroup>
-				</s:HGroup>
+			<s:Group clipAndEnableScrolling="false" >
+				<s:HGroup  height="8%"  width="{parentApplication.width}"  fontSize="10" id="hbTools" gap="10"  clipAndEnableScrolling="false" >		  	
+					<s:HGroup  paddingLeft="7" paddingRight="7" paddingBottom="5" paddingTop="5" width="30%" height="100%" id="hbxAddress">
+						
+						<s:Label text="Find:" fontWeight="bold" fontSize="13" width="42"/>
+						<s:VGroup>
+							<s:TextInput id="txtFindSite" fontSize="12" fontStyle="italic" 
+										 toolTip="type address or parcel number" text="" 
+										 width="216" 
+										 enter="onNewSearch(event)"
+										 focusIn="txtFindSite_focusInHandler(event)"/>
+							<s:Label id="lblSelectedAddress" text="Selected: " fontSize="12"/>
+						</s:VGroup>
+						
+						<mx:Button id="btnGo" fontSize="12"
+								   label="Go" 
+								   click="onNewSearch(event)"/>
+						<s:VGroup height="100%" horizontalAlign="center" gap="0">
+							<mx:Label text="e.g: 505 S Vulcan Ave" textAlign="left" width="100%" fontSize="9"/>
+							<mx:Label text="or"/>
+							<mx:Label text="2580904300"/>
+						</s:VGroup>
+					</s:HGroup>
 					
-		        <s:HGroup   paddingLeft="5" paddingRight="5" paddingBottom="5" paddingTop="5"  width="70%" id="hbxTools">
-		    			<s:ButtonBar id="tbb" height="32"
-		    				creationComplete="tbb.selectedIndex = 2" 
-		    				valueCommit="if (tbb.selectedIndex == -1) { navToolbar.deactivate() }"
-		    				change="navitemClickHandler(event)"  
-							skinClass="skins.IconButtonBarSkin" 
-		    				buttonMode="true" > 
+					<s:HGroup   paddingLeft="5" paddingRight="5" paddingBottom="5" paddingTop="5"  width="70%" id="hbxTools"  clipAndEnableScrolling="false">
+						<s:ButtonBar id="tbb" height="32"
+									 creationComplete="tbb.selectedIndex = 2" 
+									 valueCommit="if (tbb.selectedIndex == -1) { navToolbar.deactivate() }"
+									 change="navitemClickHandler(event)"  
+									 skinClass="skins.IconButtonBarSkin" 
+									 buttonMode="true" > 
 							<s:dataProvider>
 								<mx:ArrayCollection id="acNavTool" >                
 									<fx:Object data="Zoom In"  imageIcon="@Embed(source='assets/icons/i_zoomin.png')" label="Click or drag on map to zoom in"/>
@@ -2371,27 +2377,27 @@
 									<fx:Object data="Identify" imageIcon="@Embed(source='assets/icons/pan_identify.png')" label="Click on a site to get info on it or drag on map to pan around"/>
 								</mx:ArrayCollection> 
 							</s:dataProvider>
-		       
-		    			 </s:ButtonBar>        
-		    			 <mx:ControlBar horizontalGap="0" paddingBottom="0" paddingTop="0" buttonMode="true">           
-		    			 	<mx:Button  icon="@Embed(source='assets/icons/i_zoomprevious.png')" 
-		    			 		click="navToolbar.zoomToPrevExtent()"    
-		    			 		enabled="{!navToolbar.isFirstExtent}"
-		    			 		toolTip="Zoom to the previous extent"
-		    			 		height="32" 
-		    			 		width="32"  />            
-		    			   	<mx:Button icon="@Embed(source='assets/icons/i_zoomnext.png')" 
-		    			   		click="navToolbar.zoomToNextExtent()" 
-		    			   		enabled="{!navToolbar.isLastExtent}"
-		    			   		toolTip="Zoom to the next extent"
-								height="32" 
-		    			   		width="32"/>        
-		    			 </mx:ControlBar>        
-		    			 <mx:Button icon="@Embed(source='assets/icons/i_zoomfull.png')" 
-		    			   		click="map.zoomToInitialExtent()" 
-		    			   		toolTip="Zoom all the way out" 
-		    			   		height="32" 
-		    			   		width="32"/>
+							
+						</s:ButtonBar>        
+						<mx:ControlBar horizontalGap="0" paddingBottom="0" paddingTop="0" buttonMode="true">           
+							<mx:Button  icon="@Embed(source='assets/icons/i_zoomprevious.png')" 
+										click="navToolbar.zoomToPrevExtent()"    
+										enabled="{!navToolbar.isFirstExtent}"
+										toolTip="Zoom to the previous extent"
+										height="32" 
+										width="32"  />            
+							<mx:Button icon="@Embed(source='assets/icons/i_zoomnext.png')" 
+									   click="navToolbar.zoomToNextExtent()" 
+									   enabled="{!navToolbar.isLastExtent}"
+									   toolTip="Zoom to the next extent"
+									   height="32" 
+									   width="32"/>        
+						</mx:ControlBar>        
+						<mx:Button icon="@Embed(source='assets/icons/i_zoomfull.png')" 
+								   click="map.zoomToInitialExtent()" 
+								   toolTip="Zoom all the way out" 
+								   height="32" 
+								   width="32"/>
 						<s:Button id="btnzoomSelected"
 								  label="Zoom"
 								  height="32" 
@@ -2399,20 +2405,18 @@
 								  skinClass="{skins.IconButtonZoomPrevious}" click="zoomSelected_clickHandler(event)"
 								  toolTip="Zoom to Selected Site">
 						</s:Button>
-					
-					<EncComponents:encToolBar id="EncTools2" includeInLayout="false"
-											  map="{map}" parentContainer="{spContainer}" click="{tbb.selectedIndex = -1}"
-											  geometryServiceap="{geometry1}" slidingPanel="{spMain}"/>
-					
-					<mx:Spacer width="40"/>
-		    		<s:Label text="Zoom To:" fontSize="12" fontWeight="bold"/>
-		
-		    		<EncComponents:cboBookmarks id="cboBookmarks" change="onBookMarkChange(event)" toolTip="Select a location from the drop down to zoom to it" />
-					<mx:Button label="Help" id="btnHelp" fontSize="12" toolTip="Help"  visible="true" click="btnHelp_clickHandler(event)"/>	
-		    		<mx:Spacer width="100%"/>
-		    		
+
+						<mx:Spacer width="50"/>
+						<s:Label text="Zoom To:" fontSize="12" fontWeight="bold"/>
+						
+						<EncComponents:cboBookmarks id="cboBookmarks" change="onBookMarkChange(event)" toolTip="Select a location from the drop down to zoom to it" />
+						<mx:Button label="Help" id="btnHelp" fontSize="12" toolTip="Help"  visible="true" click="btnHelp_clickHandler(event)"/>	
+						<mx:Spacer width="100%"/>
+						
+					</s:HGroup>
 				</s:HGroup>
-			</s:HGroup>
+			</s:Group>
+			
 		</s:BorderContainer>
 	</s:VGroup>
 </s:Group>
