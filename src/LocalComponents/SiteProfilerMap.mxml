@@ -2322,8 +2322,9 @@
 												   imageFormat="png32" />
 				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/MapServer" 
 												   visible="false" 
+												   
 												   imageFormat="png32" />
-				<esri:GraphicsLayer id="glDistrictsServices" visible="true"/>
+				<esri:GraphicsLayer id="glDistrictsServices" visible="true" />
 				<esri:GraphicsLayer id="glAddress" graphicProvider="{arrayAddresses}" visible="true"/>
 				<esri:GraphicsLayer id="glSubdivision" graphicProvider="{arraySubdivResult}" visible="false"/>
 				<esri:GraphicsLayer id="glPermits" graphicProvider="{arrayPermits}" visible="false" alpha=".66" symbol="{symTransparent}"/>
