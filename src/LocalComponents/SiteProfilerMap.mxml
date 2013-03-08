@@ -15,18 +15,13 @@
 
 	<fx:Script>
 		<![CDATA[
-			import EncComponents.SuperPanel;
-			import EncComponents.WebForm;
-			import EncComponents.helperClass;
-			import EncComponents.splashScreen;
-			
 			import com.esri.ags.FeatureSet;
 			import com.esri.ags.Graphic;
 			import com.esri.ags.SpatialReference;
 			import com.esri.ags.events.ExtentEvent;
 			import com.esri.ags.events.GeometryServiceEvent;
+			import com.esri.ags.events.GraphicEvent;
 			import com.esri.ags.events.LayerEvent;
-			import com.esri.ags.events.MapEvent;
 			import com.esri.ags.events.MapMouseEvent;
 			import com.esri.ags.events.QueryEvent;
 			import com.esri.ags.geometry.Extent;
@@ -36,7 +31,6 @@
 			import com.esri.ags.layers.GraphicsLayer;
 			import com.esri.ags.layers.Layer;
 			import com.esri.ags.layers.supportClasses.AllDetails;
-			import com.esri.ags.layers.supportClasses.LayerDetails;
 			import com.esri.ags.layers.supportClasses.LayerInfo;
 			import com.esri.ags.layers.supportClasses.Relationship;
 			import com.esri.ags.tasks.supportClasses.AddressCandidate;
@@ -44,8 +38,9 @@
 			import com.esri.ags.tasks.supportClasses.IdentifyParameters;
 			import com.esri.ags.tasks.supportClasses.IdentifyResult;
 			import com.esri.ags.utils.WebMercatorUtil;
-			
-			import events.SlidingPanelEvent;
+			import com.esri.ags.webmap.PopUpRenderer;
+			import com.esri.ags.webmap.supportClasses.PopUpFieldInfo;
+			import com.esri.ags.webmap.supportClasses.PopUpInfo;
 			
 			import flash.filters.BitmapFilterQuality;
 			import flash.filters.BitmapFilterType;
@@ -59,31 +54,24 @@
 			import mx.collections.SortField;
 			import mx.controls.Alert;
 			import mx.controls.Button;
-			import mx.controls.ButtonBar;
-			import mx.controls.ToggleButtonBar;
 			import mx.controls.advancedDataGridClasses.AdvancedDataGridItemRenderer;
-			import mx.controls.tabBarClasses.Tab;
-			import mx.core.UIComponent;
-			import mx.effects.*;
-			import mx.events.EffectEvent;
+			import mx.effects.Glow;
 			import mx.events.FlexEvent;
 			import mx.events.IndexChangedEvent;
-			import mx.events.ItemClickEvent;
-			import mx.events.StateChangeEvent;
+			import mx.managers.CursorManager;
 			import mx.managers.PopUpManager;
 			import mx.rpc.AsyncResponder;
-			import mx.rpc.AsyncToken;
-			import mx.rpc.Fault;
 			import mx.rpc.events.FaultEvent;
 			import mx.utils.ObjectUtil;
 			
-			import skins.IconButtonSkin;
-			import skins.IconButtonZoomPrevious;
-			
-			import spark.components.Application;
-			import spark.effects.animation.*;
+			import spark.effects.animation.RepeatBehavior;
 			import spark.events.IndexChangeEvent;
-			import spark.filters.GlowFilter;
+			
+			import EncComponents.WebForm;
+			import EncComponents.helperClass;
+			import EncComponents.splashScreen;
+			
+			import events.SlidingPanelEvent;
 			
 			[Bindable]
 			private var aLayersTOC:ArrayCollection = new ArrayCollection;
@@ -212,6 +200,14 @@
 			private var mpIDPoint:MapPoint;
 			private var strBMPFacilityID:String;
 			
+			// Define a variable to hold the cursor ID.
+			private var _cursorID:Number = 1;
+			[Bindable]
+			private var _activeGraphic:Graphic;
+			// Embed the cursor symbol.
+			[Embed(source="/../assets/icons/CursorHand.png")]
+			private var waitCursorSymbol:Class;
+			
 	private function init():void
 	{
 
@@ -285,7 +281,82 @@
 		}
 	}
 
-		
+			protected function FeatureLayer_loadHandler(event:LayerEvent):void
+			{
+				var myfLayer:FeatureLayer = event.target as FeatureLayer;
+				var myfileds:Array = myfLayer.outFields
+				//_activeGraphic.graphicsLayer.infoWindowRenderer = _mypopup;
+				//_activeGraphic.graphicsLayer.infoWindowRenderer = myPopupRenderer as IFactory;
+				var xmlText:String = new String;
+				var i:int;
+				var strName:String;
+				
+				var popUpInfo:PopUpInfo = new PopUpInfo();
+				
+				popUpInfo.popUpFieldInfos = [];
+
+				for (i=0;  i < myfileds.length; i++)
+				{
+					var field1:PopUpFieldInfo = new PopUpFieldInfo();
+					if (myfileds[i].toUpperCase() == 'ADDRESS' || myfileds[i].toUpperCase() == 'TRAILUSE' || myfileds[i].toUpperCase() == 'TRAILNUMBER' || myfileds[i].toUpperCase() == 'ISPRIVATE' || myfileds[i].toUpperCase() == 'SHAPE.LEN')
+					{
+						
+						field1.fieldName = myfileds[i];
+						field1.label = myfileds[i];
+						field1.visible = true;
+						popUpInfo.popUpFieldInfos.push(field1);
+					}
+					else if (myfileds[i].toUpperCase() =='GP_SUBTYPE')
+					{
+						
+						field1.fieldName = myfileds[i];
+						field1.label = "Park Type";
+						field1.visible = true;
+						popUpInfo.popUpFieldInfos.push(field1);
+					}
+					else if (myfileds[i].toUpperCase() =='LOCATION')
+					{
+						
+						field1.fieldName = myfileds[i];
+						field1.label = "Address";
+						field1.visible = true;
+						popUpInfo.popUpFieldInfos.push(field1);
+					}
+					else if (myfileds[i].toUpperCase() =='URL')
+					{
+						
+						field1.fieldName = myfileds[i];
+						field1.label = " ";
+						field1.visible = true;
+						popUpInfo.popUpFieldInfos.push(field1);
+					}
+					else if (myfileds[i].toUpperCase() =='STATIONNUMBER')
+					{
+						
+						popUpInfo.title = "Fire Station " + "{StationNumber}";
+						
+					}	 
+					else if (myfileds[i].toUpperCase() =='NAME')
+					{
+						
+						//popUpInfo.title = "{Name}";
+						popUpInfo.title = " ";
+						
+					}
+				} 
+				
+				//popUpInfo.title = strName;
+				
+				//var mypopup:PopUpRenderer = new PopUpRenderer();
+				var mypopup:ClassFactory = new ClassFactory(PopUpRenderer);
+				
+				
+				mypopup.properties = { "popUpInfo": popUpInfo };
+				var grphlay:GraphicsLayer = event.target as GraphicsLayer;
+				
+				grphlay.infoWindowRenderer = mypopup;
+				
+			}	
 
 	private function navitemClickHandler(event:IndexChangeEvent):void
 	{
@@ -314,14 +385,58 @@
 	}
 	
 
-	
+			private function handlePopUp(event:MapMouseEvent):void
+			{
+				
+				//_activeGraphic.graphicsLayer.infoWindowRenderer = _mypopup;
+				//_activeGraphic.graphicsLayer.infoWindowRenderer = myPopupRenderer as IFactory;
+				var xmlText:String = new String;
+				var i:int;
+				var strName:String;
+
+				var myObj:PopUpRenderer = map.infoWindowContent as PopUpRenderer;
+				for (var atti:String in myObj.graphic.attributes)
+				{
+					if (atti.toUpperCase() =='NAME')
+					{
+						var myhelper:helperClass = new helperClass;
+						strName = myhelper.getDomainValue(atti, myObj.graphic.attributes[atti],myObj.graphic.graphicsLayer as FeatureLayer);
+						if (strName == "")
+						{
+							strName = myObj.graphic.attributes[atti];
+						}
+					}
+					if (atti.toUpperCase() =='STATIONNUMBER')
+					{
+						strName = myhelper.getDomainValue(atti, myObj.graphic.attributes[atti],myObj.graphic.graphicsLayer as FeatureLayer);
+						if (strName == "")
+						{
+							strName = myObj.graphic.attributes[atti];
+						}
+					}
+				}
+				
+				if (strName != "")
+				{
+					myObj.popUpInfo.title = strName;
+				}
+				
+				map.infoWindow.show(map.toMapFromStage(event.stageX, event.stageY)); 
+				
+			}
 	private function onMapClicked(event:MapMouseEvent):void
 	{
-		if (tbb.selectedIndex > 1)
+		if (cursorManager.currentCursorID == _cursorID)
 		{
-			switch ( tbb.selectedItem.data)
+			//map.infoWindow.show(map.toMapFromStage(event.stageX, event.stageY));
+			handlePopUp(event);
+		}
+		
+		switch ( tbb.selectedItem.data)
+		{
+			case "Identify":
 			{
-				case "Identify":
+				if (cursorManager.currentCursorID != _cursorID)
 				{
 					//lblAddreesCount.text = "";
 					//lblBusinessCount.text = "";
@@ -331,49 +446,54 @@
 					doQuery(event.mapPoint);
 					break;
 				}
-				case "StreetView":
+				else
 				{
-					const frmapPoint:MapPoint = map.toMapFromStage(event.stageX, event.stageY);
-					var latlong:MapPoint;
-					var wkidString:String = frmapPoint.spatialReference.wkid.toString();
-					
-					if ( wkidString == "102100")
-					{
-						latlong = WebMercatorUtil.webMercatorToGeographic(frmapPoint) as MapPoint;
-						frLat = latlong.y.toFixed(6);
-						frLong = latlong.x.toFixed(6);
-						displayForm(frLat, frLong);
-					}
-					else if ( wkidString == "3857")
-					{
-						latlong = WebMercatorUtil.webMercatorToGeographic(frmapPoint) as MapPoint;
-						frLat = latlong.y.toFixed(6);
-						frLong = latlong.x.toFixed(6);
-						displayForm(frLat, frLong);
-					}
-					else if ( wkidString == "4326")
-					{
-						latlong = map.toMapFromStage(event.stageX, event.stageY);
-						frLat = latlong.y.toFixed(6);
-						frLong = latlong.x.toFixed(6);
-						displayForm(frLat, frLong);
-					}
-					
-					var graphic:Graphic = new Graphic();	
-					var mapPoint2:MapPoint = frmapPoint;
-					mapPoint2.spatialReference = map.spatialReference;				
-					graphic.geometry = mapPoint2;				
-					graphicsLayer.clear();				
-					graphicsLayer.add(graphic);
-				}
-				default:
-				{
+					//map.infoWindow.show(map.toMapFromStage(event.stageX, event.stageY));
+					handlePopUp(event);
 					break;
 				}
+				
 			}
-
+			case "StreetView":
+			{
+				const frmapPoint:MapPoint = map.toMapFromStage(event.stageX, event.stageY);
+				var latlong:MapPoint;
+				var wkidString:String = frmapPoint.spatialReference.wkid.toString();
+				
+				if ( wkidString == "102100")
+				{
+					latlong = WebMercatorUtil.webMercatorToGeographic(frmapPoint) as MapPoint;
+					frLat = latlong.y.toFixed(6);
+					frLong = latlong.x.toFixed(6);
+					displayForm(frLat, frLong);
+				}
+				else if ( wkidString == "3857")
+				{
+					latlong = WebMercatorUtil.webMercatorToGeographic(frmapPoint) as MapPoint;
+					frLat = latlong.y.toFixed(6);
+					frLong = latlong.x.toFixed(6);
+					displayForm(frLat, frLong);
+				}
+				else if ( wkidString == "4326")
+				{
+					latlong = map.toMapFromStage(event.stageX, event.stageY);
+					frLat = latlong.y.toFixed(6);
+					frLong = latlong.x.toFixed(6);
+					displayForm(frLat, frLong);
+				}
+				
+				var graphic:Graphic = new Graphic();	
+				var mapPoint2:MapPoint = frmapPoint;
+				mapPoint2.spatialReference = map.spatialReference;				
+				graphic.geometry = mapPoint2;				
+				graphicsLayer.clear();				
+				graphicsLayer.add(graphic);
+			}
+			default:
+			{
+				break;
+			}
 		}
-
 	}
 			
 	public function displayForm(lat:String,long:String):void
@@ -1128,7 +1248,56 @@
 			//visible
 			protected function viewStackSiteProfiler_changeHandler(event:IndexChangedEvent):void
 			{
+				if (event.oldIndex == 4)
+				{
+					zoomselected();
+				}
+				else if (event.newIndex == 4)
+				{
+					var screenpt:Point
+					var pt:MapPoint
+					for each (var gr:Graphic in glDistrictsServices.graphicProvider)
+					{
+						
+						if (gr.id == "graBufferGraphic")
+						{
+							if (gr.geometry != null)
+							{
+								if (spMain.IsOpen)
+								{
+									map.extent = gr.geometry.extent;
+									map.zoom(1.55);
+									map.centerAt(gr.geometry.extent.center);
+									//_map.scale = 1128.497176;
+									screenpt = map.toScreen(map.extent.center);
+									//screenpt.x = screenpt.x + (map.width * .25);
+									screenpt.x = screenpt.x - (485/ 2);
+									pt = map.toMap(screenpt);
+									map.centerAt(pt);
+								}
+								else
+								{
+									map.extent = gr.geometry.extent;
+									map.zoom(1.55);
+									map.centerAt(gr.geometry.extent.center);
+									//_map.scale = 1128.497176;
+									screenpt = map.toScreen(map.extent.center);
+									//screenpt.x = screenpt.x + (map.width * .25);
+									screenpt.x = screenpt.x - (485/ 2);
+									pt = map.toMap(screenpt);
+									map.centerAt(pt);
+								}
+							}
+						}
+					} 
+				}
 				//turn off everything first
+				POIFL.visible = false;
+				PrivateSchoolFL.visible = false;
+				ParksFL.visible = false;
+				ChurchFL.visible = false;
+				TrailsFL.visible = false;
+				FireStationFL.visible = false;
 				glAddress.visible = false;
 				glSubdivision.visible = false;
 				glPermits.visible = false;
@@ -1160,10 +1329,17 @@
 				}
 				else if 	(event.newIndex==4)
 				{
+
 					addLayer(getLayerInfoID(SiteProfileService.layerInfos,"Districts & Services"),SiteProfileService);
 					DistrictsService.visible=true;
 					glDistrictsServices.visible = true;
 					addLayer(getLayerInfoID(DistrictsService.layerInfos,"Districts & Services"),DistrictsService);
+					POIFL.visible = true;
+					PrivateSchoolFL.visible=true;
+					ParksFL.visible=true;
+					ChurchFL.visible=true;
+					TrailsFL.visible=true;
+					FireStationFL.visible=true;
 				}
 				else if 	(event.newIndex==5)
 				{
@@ -1493,6 +1669,11 @@
 
 			protected function zoomSelected_clickHandler(event:MouseEvent):void
 			{
+				zoomselected();
+			}
+
+			private function zoomselected():void{
+				
 				var gp:ArrayCollection =  graphicsLayer.graphicProvider as ArrayCollection;
 				for each (var graphic:Graphic in gp)
 				{
@@ -1514,7 +1695,6 @@
 					}
 				}
 			}
-
 
 			protected function adgDischargePermits_mouseOverHandler(event:MouseEvent):void
 			{
@@ -1585,6 +1765,45 @@
 			{
 				navigateToURL(new URLRequest( 'http://gisweb:9231/LandRecords?X=' + mpIDPoint.x + '&Y=' + mpIDPoint.y + '&start=extent&xmin=' + map.extent.xmin + '&ymin=' + map.extent.ymin + '&xmax=' + map.extent.xmax + '&ymax=' + map.extent.ymax ),"quote");
 			}
+			
+			protected function fLayer_graphicAddHandler(event:GraphicEvent):void
+			{
+				
+				
+				
+				
+				event.graphic.addEventListener(MouseEvent.MOUSE_OVER, onMouseOverHandler);
+				event.graphic.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutHandler);
+			}
+			
+			private function onMouseOverHandler(event:MouseEvent):void
+			{
+				
+				if (event.currentTarget is Graphic)
+				{
+					_cursorID = CursorManager.setCursor(waitCursorSymbol);
+					_activeGraphic = event.currentTarget as Graphic;
+				}
+				
+			}
+			
+			private function onMouseOutHandler(event:MouseEvent):void
+			{
+				CursorManager.removeCursor(_cursorID); 
+				/* 				if (event.currentTarget is Graphic)
+				{
+				var gr:Graphic = Graphic(event.currentTarget);
+				map.infoWindow.hide();
+				} */
+			}
+			
+			protected function DistrictsService_loadHandler(event:LayerEvent):void
+			{
+/*				DistrictsService.visible=true;
+				glDistrictsServices.visible = true;
+				addLayer(getLayerInfoID(DistrictsService.layerInfos,"Districts & Services"),DistrictsService);*/
+			}
+			
 
 		]]>
 	
@@ -1748,7 +1967,8 @@
 							  map="{map}" parentContainer="{spContainer}" click="{tbb.selectedIndex = -1}"
 							  geometryServiceap="{geometry1}" slidingPanel="{spMain}" clipAndEnableScrolling="false"
 							  bottom="{parentApplication.bottom + 30}" x="{hbxAddress.width + tbb.width + 188 }"
-							  buttons="[btnTOC, btnGoogle, btnDraw, btnProject, btnGetElevation, btnProfileTool, btnGeoDocs, btnSSRS]"/>
+							  buttons="[btnTOC, btnGoogle, btnDraw, btnProject, btnGetElevation, btnProfileTool, btnGeoDocs, btnSSRS]"
+							  tocXML="http://ezoning.cityofencinitas.org/Configs/TOCWidget.xml"/>
 	
 	<s:HGroup id="spContainer" left="0"
 			  y="{basmapControl1.y}"
@@ -2036,50 +2256,16 @@
 			</s:NavigatorContent>
 			
 			
-			<s:NavigatorContent id="DistrictsServices" backgroundColor="haloSilver" label="DISTRICTS and SERVICES" >
+			<s:NavigatorContent id="DistrictsServices" backgroundColor="haloSilver" label="SERVICES &amp; AMENITIES" >
 				
 				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
-						<EncComponents:DistractsServicesComponent  
-							mapset="{map}" 
-							graphLayer="{glDistrictsServices}" 
-							queryPoint="{mpIDPoint}"
-							width="100%"
-							height="100%"/>
-<!--					<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
-						<mx:FormItem label="Community:">
-							<mx:Text id="community" width="200" text=""/>
-						</mx:FormItem>
-
-						<mx:FormItem label="Trash PickUp:">
-							<mx:Text id="txttrash" width="200" text=""/>
-						</mx:FormItem>
-						<mx:FormItem label="Street Sweeping:">
-							<mx:Label id="txtsweeping" width="200" text=""/>
-						</mx:FormItem>
-						<mx:FormItem label="Elementary School District:" borderColor="#FFFFFF">
-							<mx:Label id="txtdistricy" width="200" text=""/>
-						</mx:FormItem> 
-						<mx:FormItem label="Sewer District:">
-							<mx:Text id="txtsewer1" width="200" text=""/>
-						</mx:FormItem>
-						<mx:FormItem label="Water District:">
-							<mx:Text id="txtwaterD1" width="200" text=""/>
-						</mx:FormItem>
-						<mx:FormItem label="Census Tract/Block:">
-							<mx:Text id="txtcensus" width="200" text=""/>
-						</mx:FormItem>
-						<mx:FormItem label="General Plan Zoning:">
-							<mx:Text id="txtGPZoning" width="200" text=""/>
-						</mx:FormItem>
-						<mx:FormItem label="Thomas Bros. Page/Grid:">
-							<mx:Text id="txtThomasBros" width="200" text=""/>
-						</mx:FormItem>
-						<mx:Spacer height="20" />
-						<s:HGroup   verticalAlign="middle" width="100%" horizontalAlign="center">
-							<s:Button id="btnSchools" label="Schools"  />
-							<s:Button id="btnNearbyAmmenities" label="Nearby Amenities" />
-						</s:HGroup>
-					</mx:Form>-->
+					<EncComponents:DistractsServicesComponent  
+						mapset="{map}" 
+						graphLayer="{glDistrictsServices}" 
+						queryPoint="{mpIDPoint}"
+						viewstackindex="{viewStackSiteProfiler.selectedIndex}"
+						width="100%"
+						height="100%"/>
 					
 				</s:VGroup>
 			</s:NavigatorContent>
@@ -2320,14 +2506,60 @@
 				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://gisweb:9231/internal/rest/services/Secured/SiteProfiler/MapServer" 
 												   visible="true" load="Addresses_loadHandler(event)" 
 												   imageFormat="png32" />
-				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/MapServer" 
-												   visible="false" 
-												   
-												   imageFormat="png32" />
+
 				<esri:GraphicsLayer id="glDistrictsServices" visible="true" />
 				<esri:GraphicsLayer id="glAddress" graphicProvider="{arrayAddresses}" visible="true"/>
 				<esri:GraphicsLayer id="glSubdivision" graphicProvider="{arraySubdivResult}" visible="false"/>
 				<esri:GraphicsLayer id="glPermits" graphicProvider="{arrayPermits}" visible="false" alpha=".66" symbol="{symTransparent}"/>
+				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/MapServer" 
+												   visible="false" 
+												   imageFormat="png32"
+												   load="{DistrictsService_loadHandler(event)}">
+
+				</esri:ArcGISDynamicMapServiceLayer>
+				<esri:FeatureLayer id="ParksFL"
+								   graphicAdd="fLayer_graphicAddHandler(event)"
+								   mode="snapshot"
+								   visible="false"
+								   outFields="[Name,Address,GP_Subtype, URL]" load="FeatureLayer_loadHandler(event)"
+								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/5">
+					
+				</esri:FeatureLayer>
+				<esri:FeatureLayer id="POIFL"
+								   graphicAdd="fLayer_graphicAddHandler(event)"
+								   mode="snapshot"
+								   visible="false"
+								   outFields="[Name,Location, URL]" load="FeatureLayer_loadHandler(event)"
+								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/1" >
+				</esri:FeatureLayer>
+				<esri:FeatureLayer id="PrivateSchoolFL"
+								   graphicAdd="fLayer_graphicAddHandler(event)"
+								   mode="snapshot"
+								   visible="false"
+								   outFields="[Name,Address,Subtype,IsPrivate, URL]" load="FeatureLayer_loadHandler(event)"
+								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/2">
+				</esri:FeatureLayer>
+				<esri:FeatureLayer id="ChurchFL"
+								   graphicAdd="fLayer_graphicAddHandler(event)"
+								   mode="snapshot"
+								   visible="false"
+								   outFields="[Name,Address, URL]" load="FeatureLayer_loadHandler(event)"
+								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/3">
+				</esri:FeatureLayer>
+				<esri:FeatureLayer id="TrailsFL"
+								   graphicAdd="fLayer_graphicAddHandler(event)"
+								   mode="snapshot"
+								   visible="false"
+								   outFields="[TrailNumber,TrailUse]" load="FeatureLayer_loadHandler(event)"
+								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/4">
+				</esri:FeatureLayer>
+				<esri:FeatureLayer id="FireStationFL"
+								   graphicAdd="fLayer_graphicAddHandler(event)"
+								   mode="snapshot"
+								   visible="false"
+								   outFields="[StationNumber,Address]" load="FeatureLayer_loadHandler(event)"
+								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/6">
+				</esri:FeatureLayer>
 			</esri:Map>
 		</s:Group>
 

@@ -159,4 +159,24 @@ s|ButtonBar
 	color: #3f5101;
 }
 
+esri|InfoWindow
+{
+	border-thickness: 1;
+	borderColor: #666666;
+	background-color: #CAE3A3;
+	backgroundAlpha: 1;
+	font-size: 16;
+	upper-left-radius: 5;
+	upper-right-radius: 0;
+	info-placement: top;
+	info-offset-y: 20;
+	shadowAlpha: 0.6;
+	shadowDistance: 10;
+	
+}
 
+esri|PopUpRenderer
+{
+	chromeColor: #CAE3A3;
+	skinClass:ClassReference("skins.MyEncinitaspopupskin");
+}
