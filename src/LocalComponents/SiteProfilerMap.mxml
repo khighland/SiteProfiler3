@@ -1985,7 +1985,7 @@
 					  height="100%"
 					  change="viewStackSiteProfiler_changeHandler(event)"
 					  styleName="plain">
-			<s:NavigatorContent backgroundColor="haloSilver" id="SiteBasics" label="ADDRESS INFO">
+			<s:NavigatorContent backgroundColor="haloSilver" id="SiteBasics" label="ADDRESS &amp; BUSINESS INFO">
 
 				<fx:Script>
 					<![CDATA[
@@ -2211,7 +2211,7 @@
 				</s:VGroup>
 			</s:NavigatorContent>
 			
-			<s:NavigatorContent backgroundColor="haloSilver" id="AssessorInfo" label="ASSESSOR INFO">
+			<s:NavigatorContent backgroundColor="haloSilver" id="AssessorInfo" label="OWNER INFO">
 				<s:VGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
 					<mx:AdvancedDataGrid dataProvider="{arrcAddressRelatedToPoints}" width="100%" height="100"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
 						<mx:columns>
