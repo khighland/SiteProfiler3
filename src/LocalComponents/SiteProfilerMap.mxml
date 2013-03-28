@@ -2295,7 +2295,7 @@
 						</EncComponents:RowColorDataGrid>
 
 					<mx:Form  width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
-						<mx:FormItem label="Sewer District:">
+						<mx:FormItem label="Sewer Division:">
 							<mx:Text id="sewer" width="200" text="{txtSewerDist}"/>
 						</mx:FormItem>
 
