@@ -33,6 +33,12 @@
 	<legendtimeout>60</legendtimeout>
 	<excludelayers >
 		<excludelayer mapservice="Layers">0</excludelayer>
+		<excludelayer mapservice="Unsecured/Shaded_Relief_2009"></excludelayer>
+		<excludelayer mapservice="ArcGISTiledMapServiceLayer192"></excludelayer>
+		<excludelayer mapservice="ArcGISTiledMapServiceLayer193"></excludelayer>
+		<excludelayer mapservice="ShadedRelief"></excludelayer>
+		<excludelayer mapservice="Imagery"></excludelayer>
+		<excludelayer mapservice="LandRecords_Time"></excludelayer>
 	</excludelayers>
 	<excludegraphiclayers>true</excludegraphiclayers>
 	<excludebasemaplayers>true</excludebasemaplayers>

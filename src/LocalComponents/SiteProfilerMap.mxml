@@ -1297,7 +1297,7 @@
 				ParksFL.visible = false;
 				ChurchFL.visible = false;
 				TrailsFL.visible = false;
-				FireStationFL.visible = false;
+				FireStation.visible = false;
 				glAddress.visible = false;
 				glSubdivision.visible = false;
 				glPermits.visible = false;
@@ -1339,7 +1339,7 @@
 					ParksFL.visible=true;
 					ChurchFL.visible=true;
 					TrailsFL.visible=true;
-					FireStationFL.visible=true;
+					FireStation.visible=true;
 				}
 				else if 	(event.newIndex==5)
 				{
@@ -1812,7 +1812,7 @@
 	<fx:Declarations>
 	
 
-		
+		<fx:XML id="TOCConfig" source="/SiteProfiler3/TOCWidget.xml"/>
 		<esri:NavigationTool id="navToolbar" map="{map}"/>
 		
 		<esri:Locator id="AddressLocator"
@@ -1973,486 +1973,521 @@
 	<s:HGroup id="spContainer" left="0"
 			  y="{basmapControl1.y}"
 			  width="100%">
+
 		
 	
 	<EncComponents:SlidingPanel id="spMain" anchor="Left" 
 								width="485"
 								y="{basmapControl1.y}"  
 								height="{cnvMap.height}" 
-								startupState="closed" animateended="spMain_annimationendedHandler(event)"  >
+								startupState="closed" animateended="spMain_annimationendedHandler(event)" backgroundColor="0x66CC66" backgroundAlpha=".25"
+								>
+		<s:VGroup height="100%" >
+			<s:ButtonBar id="bbslipdingpanel" dataProvider="{stSP}" height="30" >
+				
+			</s:ButtonBar>
 			
-		<mx:ViewStack id="viewStackSiteProfiler"
-					  height="100%"
-					  change="viewStackSiteProfiler_changeHandler(event)"
-					  styleName="plain">
-			<s:NavigatorContent backgroundColor="haloSilver" id="SiteBasics" label="ADDRESS &amp; BUSINESS INFO">
-
-				<fx:Script>
-					<![CDATA[
-						import mx.events.ListEvent;
-						protected function dgResult1_itemClickHandler(event:ListEvent):void
-						{
-
-							var dgColumn:AdvancedDataGridItemRenderer = event.itemRenderer as AdvancedDataGridItemRenderer;
-							if (dgColumn)
-							{
-
-								var dataCursor:HierarchicalCollectionViewCursor = adgBusinesses.dataProvider.createCursor();
-								while (dataCursor.current) 
-								{
-									if (dataCursor.current.GroupLabel == dgColumn.data.FacilityID)
+			
+			<mx:ViewStack id ="stSP" height="100%" styleName="plain">
+				<s:NavigatorContent id="SiteDetails" label="Site Details" width="{spMain.width}">
+					<mx:ViewStack id="viewStackSiteProfiler"
+								  height="100%"
+								  change="viewStackSiteProfiler_changeHandler(event)"
+								  styleName="plain"
+								  width="{spMain.width - 30}">
+						<s:NavigatorContent backgroundColor="haloSilver" id="SiteBasics" label="ADDRESS INFO">
+							
+							<fx:Script>
+								<![CDATA[
+									import mx.events.ListEvent;
+									protected function dgResult1_itemClickHandler(event:ListEvent):void
 									{
-										adgBusinesses.dataProvider.openNode(dataCursor.current);
-										adgBusinesses.expandItem(dataCursor.current,true);
+										
+										var dgColumn:AdvancedDataGridItemRenderer = event.itemRenderer as AdvancedDataGridItemRenderer;
+										if (dgColumn)
+										{
+											
+											var dataCursor:HierarchicalCollectionViewCursor = adgBusinesses.dataProvider.createCursor();
+											while (dataCursor.current) 
+											{
+												if (dataCursor.current.GroupLabel == dgColumn.data.FacilityID)
+												{
+													adgBusinesses.dataProvider.openNode(dataCursor.current);
+													adgBusinesses.expandItem(dataCursor.current,true);
+													
+												}
+												else
+												{
+													adgBusinesses.dataProvider.closeNode(dataCursor.current);
+													
+												}
+												dataCursor.moveNext();
+											}
+											adgBusinesses.findString(dgColumn.data.FacilityID);
+											adgBusinesses.expandItem(adgBusinesses.selectedItem,true);
+											adgBusinesses.invalidateDisplayList();
+											adgBusinesses.invalidateList();
+										}
+									}
+									
+									private function calcRowColor( item:Object, rowIndex:int, dataIndex:int, color:uint):uint
+									{
+										if(item.Businesses == "True")
+											return 0x49FFAD;
+										else
+											return color;
+									}
+									
+									private function calcDischargePermitRowColor( item:Object, rowIndex:int, dataIndex:int, color:uint):uint
+									{
+										if (strBMPFacilityID != "null")
+										{
+											if(item.FacilityID == strBMPFacilityID)
+												return 0x49FFAD;
+											else
+												return color;
+										}
+										else
+										{
+											return color;
+										}
 										
 									}
-									else
-									{
-										adgBusinesses.dataProvider.closeNode(dataCursor.current);
-										
+									private function date_sortCompareFunc(itemA:Object, itemB:Object):int {
+										/* Date.parse() returns an int, but
+										ObjectUtil.dateCompare() expects two
+										Date objects, so convert String to
+										int to Date. */
+										var dateA:Date = new Date(Date.parse(itemA.LegalStartDate));
+										var dateB:Date = new Date(Date.parse(itemB.LegalStartDate));
+										return ObjectUtil.dateCompare(dateA, dateB);
 									}
-									dataCursor.moveNext();
-								}
-								adgBusinesses.findString(dgColumn.data.FacilityID);
-								adgBusinesses.expandItem(adgBusinesses.selectedItem,true);
-								adgBusinesses.invalidateDisplayList();
-								adgBusinesses.invalidateList();
-							}
-						}
-						
-						private function calcRowColor( item:Object, rowIndex:int, dataIndex:int, color:uint):uint
-						{
-							if(item.Businesses == "True")
-								return 0x49FFAD;
-							else
-								return color;
-						}
-						
-						private function calcDischargePermitRowColor( item:Object, rowIndex:int, dataIndex:int, color:uint):uint
-						{
-							if (strBMPFacilityID != "null")
-							{
-								if(item.FacilityID == strBMPFacilityID)
-									return 0x49FFAD;
-								else
-									return color;
-							}
-							else
-							{
-								return color;
-							}
-
-						}
-						private function date_sortCompareFunc(itemA:Object, itemB:Object):int {
-							/* Date.parse() returns an int, but
-							ObjectUtil.dateCompare() expects two
-							Date objects, so convert String to
-							int to Date. */
-							var dateA:Date = new Date(Date.parse(itemA.LegalStartDate));
-							var dateB:Date = new Date(Date.parse(itemB.LegalStartDate));
-							return ObjectUtil.dateCompare(dateA, dateB);
-						}
-						//Function to expand all nodes in a grouped data grid
-						private function openMe():void 
-						{ 
-							var obj:Object = gcPermits.getRoot(); 
-							var temp:Object = ListCollectionView(obj).getItemAt(0); 
-							adgPermits.expandItem(temp,true); 
-						}
-
-
-
-					]]>
-				</fx:Script>
-
-				<s:VGroup id="addrVBox" height="100%" width="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
-
-					<s:HGroup width="100%">
-						<s:Label id="lblAddrees" text="Addresses Found = " fontStyle="italic"/>
-						<s:Label id="lblAddreesCount" text="0" fontStyle="italic"/>
-					</s:HGroup>
-					
-					<EncComponents:RowColorDataGrid rowColorFunction="calcRowColor"
-						 id="dgResult1"  
-						 dataProvider="{Result1}" 
-						 wordWrap="true"  
-						 rowCount="{Result1.length}" 
-						 height="100%" width="100%" 
-						 variableRowHeight="true" 
-						 verticalScrollPolicy="auto" 
-						 mouseOver="{onMouseOverCell(event)}"
-						 itemClick="dgResult1_itemClickHandler(event)"
-						 textAlign="left">			
-						
-						 <EncComponents:columns>
-							 <mx:AdvancedDataGridColumn dataField="Address" headerText="Site Address" sortable="true" visible="true" width="{spMain.width / 2}"  />
-							 <mx:AdvancedDataGridColumn dataField="Type" headerText="Type" sortable="true" visible="true" width="{spMain.width / 4}" />
-							 <mx:AdvancedDataGridColumn dataField="FacilityID" headerText="FacilityID" sortable="true" visible="true" width="{spMain.width / 4}" />
-						 </EncComponents:columns>
-
-					</EncComponents:RowColorDataGrid>
-					<s:HGroup>
-						<s:Label id="lblBusiness" text="Associated Businesses = " fontStyle="italic"/>
-						<s:Label id="lblBusinessCount" text="0" fontStyle="italic"/>
-					</s:HGroup>
-						
-						
-					<mx:AdvancedDataGrid id="adgBusinesses" 
-										 width="100%" height="100%" 
-										 horizontalScrollPolicy="auto" 
-										 verticalScrollPolicy="auto" 
-										 selectable="true" 
-										 textAlign="left"
-										 wordWrap="true"
-										 variableRowHeight="true">
-						<mx:dataProvider>
-							<mx:GroupingCollection2 id="gc" source="{Result3}">
-								<mx:grouping>
-									<mx:Grouping>
-										<mx:GroupingField name="AddressFacilityID"/>
-									</mx:Grouping>
-								</mx:grouping>
-							</mx:GroupingCollection2>
-						</mx:dataProvider>   						
-						
-						
-						<mx:columns>	
-							<mx:AdvancedDataGridColumn dataField="AddressFacilityID" sortable="true" visible="true" width="{spMain.width / 5}" />
-							<mx:AdvancedDataGridColumn dataField="BusinessName" sortable="true" visible="true" width="{spMain.width / 2}" />
-							<mx:AdvancedDataGridColumn dataField="HDLAccount" sortable="true" visible="true" width="{spMain.width / 5}" />
-						</mx:columns>
-					</mx:AdvancedDataGrid>
-				
-				</s:VGroup>
-			</s:NavigatorContent>
-			<s:NavigatorContent  id="LandRecords" backgroundColor="haloSilver" label="LAND RECORDS">
-					<s:VGroup id="assesorVBox" width="100%" height="100%"  paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
-						<mx:Form width="100%" height="100%" fontSize="13" borderStyle="solid"  borderColor="#2D39E0" backgroundColor="#DDDDDD" backgroundAlpha=".7">
-							<mx:FormItem label="Name">
-								<s:Label id="lblPlanName" text="{txtPlanName}" />
-							</mx:FormItem>
-							<mx:FormItem label="Legal Date">
-								<s:Label id="lblLglDate" text="{txtLglDate}" />
-							</mx:FormItem>
-							<mx:FormItem label="County Recording">
-								<s:Label id="lblPCntyRecording" text="{txtPCntyRecording}" />
-							</mx:FormItem>
-							<mx:FormItem label="Survey Date">
-								<s:Label id="lblSurveyDate" text="{txtSurveyDate}" />
-							</mx:FormItem>
-							<mx:FormItem label="Surveyor">
-								<s:Label id="lblSurveyor" text="{txtSurveyor}" />
-							</mx:FormItem>
-							<mx:FormItem label="Company">
-								<s:Label id="lblCompany" text="{txtCompany}" />
-							</mx:FormItem>
-							<mx:FormItem label="Plan Residential Development">
-								<s:Label id="lblPResDevel" text="{txtPResDevel}" />
-							</mx:FormItem>
-							<mx:FormItem label="Description">
-								<s:TextArea id="taPDescription" text="{txtPDescription}" editable="false" heightInLines="5" widthInChars="15" borderVisible="false" contentBackgroundAlpha="0" />
-							</mx:FormItem>
-						</mx:Form>
-						<s:VGroup verticalAlign="bottom" width="100%" height="100%" fontSize="13">
-							<s:Label text="Parcels Selected = 2" fontSize="12"/>
-							<mx:AdvancedDataGrid width="100%" height="100%"  id="dgSubdiv" 
-												 horizontalScrollPolicy="auto" 
-												 verticalScrollPolicy="auto" 
-												 selectable="true"
-												 dataProvider="{arrcSubdiv}"
-												 mouseOver="dgSubdiv_mouseOverHandler(event)"
-												 mouseOut="dgSubdiv_mouseOutHandler(event)">
-								<mx:columns>
-									<mx:AdvancedDataGridColumn headerText="Map Name" dataField="Name" sortable="true" visible="true" />
-									<mx:AdvancedDataGridColumn headerText="Legal Date" sortCompareFunction="date_sortCompareFunc" dataField="LegalStartDate" sortable="true" visible="true" sortDescending="true" />
-									<mx:AdvancedDataGridColumn headerText="Area" dataField="StatedArea" sortable="true" visible="true" />
-									<mx:AdvancedDataGridColumn headerText="Historical" dataField="Historical" sortable="true" visible="true" />
-									<mx:AdvancedDataGridColumn headerText="Misclose" dataField="MiscloseDistance" sortable="true" visible="true" />
-									<mx:AdvancedDataGridColumn headerText="Max Dwelling Units" dataField="MaxDwellingUnits" sortable="true" visible="true" />
-									<mx:AdvancedDataGridColumn headerText="PlanID" dataField="PlanID" sortable="false" visible="false"  />
-									<mx:AdvancedDataGridColumn headerText="OBJECTID" dataField="OBJECTID" sortable="false" visible="false"  />
-								</mx:columns>
-							</mx:AdvancedDataGrid>
-							<s:Button id="btnLandRecsApp" click="btnLandRecsApp_clickHandler(event)" label="Land Records App"/>
-						</s:VGroup>			
-					</s:VGroup>
-			</s:NavigatorContent>	
-
-			<s:NavigatorContent id="Permits" backgroundColor="haloSilver" label="PERMITS"  show="Permits_showHandler(event)">
-				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
-					
-				
-					<mx:AdvancedDataGrid id="adgPermits" 
-										 width="100%" height="100%"  
-										 horizontalScrollPolicy="auto" 
-										 verticalScrollPolicy="auto" 
-										 selectable="true" 
-										 wordWrap="true"
-										 variableRowHeight="true"
-										 mouseOver="adgPermits_mouseOverHandler(event)"
-										 mouseOut="adgPermits_mouseOutHandler(event)">
-						<mx:dataProvider>
-							<mx:GroupingCollection2 id="gcPermits" source="{acGradingPermits}" >
-								<mx:grouping >
-									<mx:Grouping >
-										<mx:GroupingField name="PermitType" />
-									</mx:Grouping>
-								</mx:grouping>
-							</mx:GroupingCollection2>
-						</mx:dataProvider> 
-
-						<mx:columns>
-							<mx:AdvancedDataGridColumn headerText="Permit Type " dataField="PermitType" sortable="true" visible="true" width="200" />
-							<mx:AdvancedDataGridColumn headerText="Permit Year" dataField="PermitYear" sortable="true" visible="true" />
-							<mx:AdvancedDataGridColumn headerText="Permit Sequence" dataField="PermitSequence" sortable="true" visible="true" />
-							<mx:AdvancedDataGridColumn headerText="ObjectID" dataField="OBJECTID" visible="false" />
-						</mx:columns>
-					</mx:AdvancedDataGrid>
-				</s:VGroup>
-			</s:NavigatorContent>
-			
-			<s:NavigatorContent backgroundColor="haloSilver" id="AssessorInfo" label="OWNER INFO">
-				<s:VGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
-					<mx:AdvancedDataGrid dataProvider="{arrcAddressRelatedToPoints}" width="100%" height="100"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
-						<mx:columns>
-							<mx:AdvancedDataGridColumn dataField="gispub.GIS.hdl_TaxRec.SitusStreet" headerText="Site Address" sortable="true" visible="true" />
-						</mx:columns>
-					</mx:AdvancedDataGrid>
-
-					<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
-
-						<mx:FormItem label="APN:">
-							<mx:Label  id="lblAPN" width="200" text="{myParcelCursor.current.APN}"/>
-						</mx:FormItem>
-						<mx:FormItem label="Owner Name:">
-							<s:TextArea heightInLines="2" editable="false" id="lblOwnerName" width="200" text="{myParcelCursor.current.OwnerName1}"  borderVisible="false" contentBackgroundAlpha="0.0"/>
-						</mx:FormItem>
-						<mx:FormItem label="Mail Street:">
-							<mx:Text id="mstreet" width="200" text="{myParcelCursor.current.MailStreet}"/>
-						</mx:FormItem>
-						<mx:FormItem label="Mail City:">
-							<mx:Text id="mcity" width="200" text="{myParcelCursor.current.MailCity}"/>
-						</mx:FormItem>
-						<mx:FormItem label="Mail State:">
-							<mx:Label id="mState" width="200" text="{myParcelCursor.current.MailState}"/>
-						</mx:FormItem>
-						<mx:FormItem label="Mail ZIP:" borderColor="#FFFFFF" >
-							<mx:Label id="mZIP" width="200" text="{myParcelCursor.current.MailZip}"/>
-						</mx:FormItem> 
-						<mx:FormItem label="Is Owner Occupied?" borderColor="#FFFFFF" >
-							<mx:Label id="mOcc" width="200" text="{myParcelCursor.current.AbsenteeFlag}"/>
-						</mx:FormItem> 
-						<EncComponents:FormNav id="FormNav1" cursor="{myParcelCursor}" arrayCol="{acParcelResults}"/>
-						
-
-					</mx:Form>
-					
-					<mx:AdvancedDataGrid dataProvider="{acHistoricParcels}" width="100%" height="100"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
-						<mx:columns>
-							<mx:AdvancedDataGridColumn dataField="APN" headerText="Historic APN(s)" sortable="true" visible="true" />
-						</mx:columns>
-					</mx:AdvancedDataGrid>
-				</s:VGroup>
-			</s:NavigatorContent>
-			
-			
-			<s:NavigatorContent id="DistrictsServices" backgroundColor="haloSilver" label="SERVICES &amp; AMENITIES" >
-				
-				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
-					<EncComponents:DistractsServicesComponent  
-						mapset="{map}" 
-						graphLayer="{glDistrictsServices}" 
-						queryPoint="{mpIDPoint}"
-						viewstackindex="{viewStackSiteProfiler.selectedIndex}"
-						width="100%"
-						height="100%"/>
-					
-				</s:VGroup>
-			</s:NavigatorContent>
-			
-			<s:NavigatorContent id="Utilities" backgroundColor="haloSilver" label="SEWER">
-				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
-
-						<mx:AdvancedDataGrid id="adgDischargePoints" 
-											 dataProvider="{arrcSewerEDU}" 
-											 mouseOver="adgDischargePermits_mouseOverHandler(event)"
-											 width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
-							<mx:columns>
-								<mx:AdvancedDataGridColumn headerText="FacilityID" dataField="FacilityID" sortable="true" visible="true" />
-								<mx:AdvancedDataGridColumn dataField="DischargePermitFacilityID" visible="true"/>
-								<mx:AdvancedDataGridColumn headerText="EDUs" dataField="EDUTHISPOINT" sortable="true" visible="true" />
+									//Function to expand all nodes in a grouped data grid
+									private function openMe():void 
+									{ 
+										var obj:Object = gcPermits.getRoot(); 
+										var temp:Object = ListCollectionView(obj).getItemAt(0); 
+										adgPermits.expandItem(temp,true); 
+									}
+									
+									
+									
+								]]>
+							</fx:Script>
+							
+							<s:VGroup id="addrVBox" height="100%" width="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
 								
-							</mx:columns>
-						</mx:AdvancedDataGrid>
-						<EncComponents:RowColorDataGrid id="adgDischargePermits"  rowColorFunction="calcDischargePermitRowColor"  dataProvider="{arrcSewerPermits}" width="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true" >
-							<EncComponents:columns>
-								<mx:AdvancedDataGridColumn headerText="FacilityID" dataField="FacilityID" sortable="true" visible="true" />
-								<mx:AdvancedDataGridColumn headerText="Permit Prefix" dataField="PERMITPREFIX" sortable="true" visible="true" />
-								<mx:AdvancedDataGridColumn headerText="Permit Year" dataField="PERMITYEAR" sortable="true" visible="true" />
-								<mx:AdvancedDataGridColumn headerText="Permit Sequence" dataField="PERMITSEQUENCE" sortable="true" visible="true" />
-								<mx:AdvancedDataGridColumn headerText="EDUs" dataField="EDUTHISPERMIT" sortable="true" visible="true" />
-							</EncComponents:columns>
-						</EncComponents:RowColorDataGrid>
-
-					<mx:Form  width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+								<s:HGroup width="100%">
+									<s:Label id="lblAddrees" text="Addresses Found = " fontStyle="italic"/>
+									<s:Label id="lblAddreesCount" text="0" fontStyle="italic"/>
+								</s:HGroup>
+								
+								<EncComponents:RowColorDataGrid rowColorFunction="calcRowColor"
+																id="dgResult1"  
+																dataProvider="{Result1}" 
+																wordWrap="true"  
+																rowCount="{Result1.length}" 
+																height="100%" width="100%" 
+																variableRowHeight="true" 
+																verticalScrollPolicy="auto" 
+																mouseOver="{onMouseOverCell(event)}"
+																itemClick="dgResult1_itemClickHandler(event)"
+																textAlign="left">			
+									
+									<EncComponents:columns>
+										<mx:AdvancedDataGridColumn dataField="Address" headerText="Site Address" sortable="true" visible="true" width="{spMain.width / 2}"  />
+										<mx:AdvancedDataGridColumn dataField="Type" headerText="Type" sortable="true" visible="true" width="{spMain.width / 4}" />
+										<mx:AdvancedDataGridColumn dataField="FacilityID" headerText="FacilityID" sortable="true" visible="true" width="{spMain.width / 4}" />
+									</EncComponents:columns>
+									
+								</EncComponents:RowColorDataGrid>
+								<s:HGroup>
+									<s:Label id="lblBusiness" text="Associated Businesses = " fontStyle="italic"/>
+									<s:Label id="lblBusinessCount" text="0" fontStyle="italic"/>
+								</s:HGroup>
+								
+								
+								<mx:AdvancedDataGrid id="adgBusinesses" 
+													 width="100%" height="100%" 
+													 horizontalScrollPolicy="auto" 
+													 verticalScrollPolicy="auto" 
+													 selectable="true" 
+													 textAlign="left"
+													 wordWrap="true"
+													 variableRowHeight="true">
+									<mx:dataProvider>
+										<mx:GroupingCollection2 id="gc" source="{Result3}">
+											<mx:grouping>
+												<mx:Grouping>
+													<mx:GroupingField name="AddressFacilityID"/>
+												</mx:Grouping>
+											</mx:grouping>
+										</mx:GroupingCollection2>
+									</mx:dataProvider>   						
+									
+									
+									<mx:columns>	
+										<mx:AdvancedDataGridColumn dataField="AddressFacilityID" sortable="true" visible="true" width="{spMain.width / 5}" />
+										<mx:AdvancedDataGridColumn dataField="BusinessName" sortable="true" visible="true" width="{spMain.width / 2}" />
+										<mx:AdvancedDataGridColumn dataField="HDLAccount" sortable="true" visible="true" width="{spMain.width / 5}" />
+									</mx:columns>
+								</mx:AdvancedDataGrid>
+								
+							</s:VGroup>
+						</s:NavigatorContent>
+						<s:NavigatorContent  id="LandRecords" backgroundColor="haloSilver" label="LAND RECORDS" height="100%">
+							<s:VGroup id="assesorVBox" width="100%" height="100%"  paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
+								<mx:Form width="100%" height="100%" fontSize="13" borderStyle="solid"  borderColor="#2D39E0" backgroundColor="#DDDDDD" backgroundAlpha=".7">
+									<mx:FormItem label="Name">
+										<s:Label id="lblPlanName" text="{txtPlanName}" />
+									</mx:FormItem>
+									<mx:FormItem label="Legal Date">
+										<s:Label id="lblLglDate" text="{txtLglDate}" />
+									</mx:FormItem>
+									<mx:FormItem label="County Recording">
+										<s:Label id="lblPCntyRecording" text="{txtPCntyRecording}" />
+									</mx:FormItem>
+									<mx:FormItem label="Survey Date">
+										<s:Label id="lblSurveyDate" text="{txtSurveyDate}" />
+									</mx:FormItem>
+									<mx:FormItem label="Surveyor">
+										<s:Label id="lblSurveyor" text="{txtSurveyor}" />
+									</mx:FormItem>
+									<mx:FormItem label="Company">
+										<s:Label id="lblCompany" text="{txtCompany}" />
+									</mx:FormItem>
+									<mx:FormItem label="Plan Residential Development">
+										<s:Label id="lblPResDevel" text="{txtPResDevel}" />
+									</mx:FormItem>
+									<mx:FormItem label="Description">
+										<s:TextArea id="taPDescription" text="{txtPDescription}" editable="false" heightInLines="5" widthInChars="15" borderVisible="false" contentBackgroundAlpha="0" />
+									</mx:FormItem>
+								</mx:Form>
+								<s:VGroup verticalAlign="bottom" width="100%" height="100%" fontSize="13">
+									<s:Label text="Parcels Selected = 2" fontSize="12"/>
+									<mx:AdvancedDataGrid width="100%" height="100%"  id="dgSubdiv" 
+														 horizontalScrollPolicy="auto" 
+														 verticalScrollPolicy="auto" 
+														 selectable="true"
+														 dataProvider="{arrcSubdiv}"
+														 mouseOver="dgSubdiv_mouseOverHandler(event)"
+														 mouseOut="dgSubdiv_mouseOutHandler(event)">
+										<mx:columns>
+											<mx:AdvancedDataGridColumn headerText="Map Name" dataField="Name" sortable="true" visible="true" />
+											<mx:AdvancedDataGridColumn headerText="Legal Date" sortCompareFunction="date_sortCompareFunc" dataField="LegalStartDate" sortable="true" visible="true" sortDescending="true" />
+											<mx:AdvancedDataGridColumn headerText="Area" dataField="StatedArea" sortable="true" visible="true" />
+											<mx:AdvancedDataGridColumn headerText="Historical" dataField="Historical" sortable="true" visible="true" />
+											<mx:AdvancedDataGridColumn headerText="Misclose" dataField="MiscloseDistance" sortable="true" visible="true" />
+											<mx:AdvancedDataGridColumn headerText="Max Dwelling Units" dataField="MaxDwellingUnits" sortable="true" visible="true" />
+											<mx:AdvancedDataGridColumn headerText="PlanID" dataField="PlanID" sortable="false" visible="false"  />
+											<mx:AdvancedDataGridColumn headerText="OBJECTID" dataField="OBJECTID" sortable="false" visible="false"  />
+										</mx:columns>
+									</mx:AdvancedDataGrid>
+									<s:Button id="btnLandRecsApp" click="btnLandRecsApp_clickHandler(event)" label="Land Records App"/>
+								</s:VGroup>			
+							</s:VGroup>
+						</s:NavigatorContent>	
+						
+						<s:NavigatorContent id="Permits" backgroundColor="haloSilver" label="PERMITS"  show="Permits_showHandler(event)">
+							<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
+								
+								
+								<mx:AdvancedDataGrid id="adgPermits" 
+													 width="100%" height="100%"  
+													 horizontalScrollPolicy="auto" 
+													 verticalScrollPolicy="auto" 
+													 selectable="true" 
+													 wordWrap="true"
+													 variableRowHeight="true"
+													 mouseOver="adgPermits_mouseOverHandler(event)"
+													 mouseOut="adgPermits_mouseOutHandler(event)">
+									<mx:dataProvider>
+										<mx:GroupingCollection2 id="gcPermits" source="{acGradingPermits}" >
+											<mx:grouping >
+												<mx:Grouping >
+													<mx:GroupingField name="PermitType" />
+												</mx:Grouping>
+											</mx:grouping>
+										</mx:GroupingCollection2>
+									</mx:dataProvider> 
+									
+									<mx:columns>
+										<mx:AdvancedDataGridColumn headerText="Permit Type " dataField="PermitType" sortable="true" visible="true" width="200" />
+										<mx:AdvancedDataGridColumn headerText="Permit Year" dataField="PermitYear" sortable="true" visible="true" />
+										<mx:AdvancedDataGridColumn headerText="Permit Sequence" dataField="PermitSequence" sortable="true" visible="true" />
+										<mx:AdvancedDataGridColumn headerText="ObjectID" dataField="OBJECTID" visible="false" />
+									</mx:columns>
+								</mx:AdvancedDataGrid>
+							</s:VGroup>
+						</s:NavigatorContent>
+						
+						<s:NavigatorContent backgroundColor="haloSilver" id="AssessorInfo" label="ASSESSOR INFO">
+							<s:VGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
+								<mx:AdvancedDataGrid dataProvider="{arrcAddressRelatedToPoints}" width="100%" height="100"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+									<mx:columns>
+										<mx:AdvancedDataGridColumn dataField="gispub.GIS.hdl_TaxRec.SitusStreet" headerText="Site Address" sortable="true" visible="true" />
+									</mx:columns>
+								</mx:AdvancedDataGrid>
+								
+								<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+									
+									<mx:FormItem label="APN:">
+										<mx:Label  id="lblAPN" width="200" text="{myParcelCursor.current.APN}"/>
+									</mx:FormItem>
+									<mx:FormItem label="Owner Name:">
+										<s:TextArea heightInLines="2" editable="false" id="lblOwnerName" width="200" text="{myParcelCursor.current.OwnerName1}"  borderVisible="false" contentBackgroundAlpha="0.0"/>
+									</mx:FormItem>
+									<mx:FormItem label="Mail Street:">
+										<mx:Text id="mstreet" width="200" text="{myParcelCursor.current.MailStreet}"/>
+									</mx:FormItem>
+									<mx:FormItem label="Mail City:">
+										<mx:Text id="mcity" width="200" text="{myParcelCursor.current.MailCity}"/>
+									</mx:FormItem>
+									<mx:FormItem label="Mail State:">
+										<mx:Label id="mState" width="200" text="{myParcelCursor.current.MailState}"/>
+									</mx:FormItem>
+									<mx:FormItem label="Mail ZIP:" borderColor="#FFFFFF" >
+										<mx:Label id="mZIP" width="200" text="{myParcelCursor.current.MailZip}"/>
+									</mx:FormItem> 
+									<mx:FormItem label="Is Owner Occupied?" borderColor="#FFFFFF" >
+										<mx:Label id="mOcc" width="200" text="{myParcelCursor.current.AbsenteeFlag}"/>
+									</mx:FormItem> 
+									<EncComponents:FormNav id="FormNav1" cursor="{myParcelCursor}" arrayCol="{acParcelResults}"/>
+									
+									
+								</mx:Form>
+								
+								<mx:AdvancedDataGrid dataProvider="{acHistoricParcels}" width="100%" height="100"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+									<mx:columns>
+										<mx:AdvancedDataGridColumn dataField="APN" headerText="Historic APN(s)" sortable="true" visible="true" />
+									</mx:columns>
+								</mx:AdvancedDataGrid>
+							</s:VGroup>
+						</s:NavigatorContent>
+						
+						
+						<s:NavigatorContent id="DistrictsServices" backgroundColor="haloSilver" label="SERVICES &amp; AMENITIES" >
+							
+							<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
+								<EncComponents:DistractsServicesComponent  
+									mapset="{map}" 
+									graphLayer="{glDistrictsServices}" 
+									queryPoint="{mpIDPoint}"
+									viewstackindex="{viewStackSiteProfiler.selectedIndex}"
+									width="100%"
+									height="100%"/>
+								
+							</s:VGroup>
+						</s:NavigatorContent>
+						
+						<s:NavigatorContent id="Utilities" backgroundColor="haloSilver" label="SEWER">
+							<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
+								
+								<mx:AdvancedDataGrid id="adgDischargePoints" 
+													 dataProvider="{arrcSewerEDU}" 
+													 mouseOver="adgDischargePermits_mouseOverHandler(event)"
+													 width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+									<mx:columns>
+										<mx:AdvancedDataGridColumn headerText="FacilityID" dataField="FacilityID" sortable="true" visible="true" />
+										<mx:AdvancedDataGridColumn dataField="DischargePermitFacilityID" visible="true"/>
+										<mx:AdvancedDataGridColumn headerText="EDUs" dataField="EDUTHISPOINT" sortable="true" visible="true" />
+										
+									</mx:columns>
+								</mx:AdvancedDataGrid>
+								<EncComponents:RowColorDataGrid id="adgDischargePermits"  rowColorFunction="calcDischargePermitRowColor"  dataProvider="{arrcSewerPermits}" width="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true" >
+									<EncComponents:columns>
+										<mx:AdvancedDataGridColumn headerText="FacilityID" dataField="FacilityID" sortable="true" visible="true" />
+										<mx:AdvancedDataGridColumn headerText="Permit Prefix" dataField="PERMITPREFIX" sortable="true" visible="true" />
+										<mx:AdvancedDataGridColumn headerText="Permit Year" dataField="PERMITYEAR" sortable="true" visible="true" />
+										<mx:AdvancedDataGridColumn headerText="Permit Sequence" dataField="PERMITSEQUENCE" sortable="true" visible="true" />
+										<mx:AdvancedDataGridColumn headerText="EDUs" dataField="EDUTHISPERMIT" sortable="true" visible="true" />
+									</EncComponents:columns>
+								</EncComponents:RowColorDataGrid>
+								
+								<mx:Form  width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
 						<mx:FormItem label="Sewer Division:">
-							<mx:Text id="sewer" width="200" text="{txtSewerDist}"/>
-						</mx:FormItem>
-
-						<mx:FormItem label="Sewer Reimbursement District:">
-							<mx:Text id="sewerRD" width="200" text="{txtSewerReimbursement}"/>
-						</mx:FormItem>
-					</mx:Form>
-				</s:VGroup>
-			</s:NavigatorContent>
-			
-			<s:NavigatorContent id="ncWater" backgroundColor="haloSilver" label="WATER">
-				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
-					<mx:Form  width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
-						<mx:FormItem label="Water District:">
-							<mx:Text id="waterD" width="200" text="{txtWaterDist}"/>
-						</mx:FormItem>
-						<mx:FormItem label="Water Meter Cycle Area:">
-							<mx:Text id="sewerMCA" width="200" text="{txtWaterCycle}"/>
-						</mx:FormItem>
-
-						<mx:FormItem label="Uses Recycled Water?">
-							<mx:Text id="waterRecycled" width="200" text="{txtWaterRecycled}"/>
-						</mx:FormItem>
-						<s:Label id="lblWDWarning" text="Meter data is only available for SDWD" visible="false" />
-						<mx:FormItem label="Water Meter Number(s):" width="350" height="100%">
-							<mx:AdvancedDataGrid width="100%" height="100%" dataProvider="{arrWaterMeters}"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
-								<mx:columns>
-									<mx:AdvancedDataGridColumn dataField="MeterNumber" headerText="Meter No." sortable="true" visible="true" />
-								</mx:columns>
-							</mx:AdvancedDataGrid>
-						</mx:FormItem>
-					</mx:Form>
-				</s:VGroup>
-			</s:NavigatorContent>
-			
-			<s:NavigatorContent id="ncStormWater" backgroundColor="haloSilver" label="STORMWATER">
-				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
-					<s:Label text="BMPs" />
-					<mx:AdvancedDataGrid width="95%" height="100%"  
-										 horizontalScrollPolicy="off"
-										 verticalScrollPolicy="auto" selectable="true"
-										 dataProvider="{arrcBMPs}">
+										<mx:Text id="sewer" width="200" text="{txtSewerDist}"/>
+									</mx:FormItem>
+									
+									<mx:FormItem label="Sewer Reimbursement District:">
+										<mx:Text id="sewerRD" width="200" text="{txtSewerReimbursement}"/>
+									</mx:FormItem>
+								</mx:Form>
+							</s:VGroup>
+						</s:NavigatorContent>
+						
+						<s:NavigatorContent id="ncWater" backgroundColor="haloSilver" label="WATER">
+							<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
+								<mx:Form  width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+									<mx:FormItem label="Water District:">
+										<mx:Text id="waterD" width="200" text="{txtWaterDist}"/>
+									</mx:FormItem>
+									<mx:FormItem label="Water Meter Cycle Area:">
+										<mx:Text id="sewerMCA" width="200" text="{txtWaterCycle}"/>
+									</mx:FormItem>
+									
+									<mx:FormItem label="Uses Recycled Water?">
+										<mx:Text id="waterRecycled" width="200" text="{txtWaterRecycled}"/>
+									</mx:FormItem>
+									<s:Label id="lblWDWarning" text="Meter data is only available for SDWD" visible="false" />
+									<mx:FormItem label="Water Meter Number(s):" width="350" height="100%">
+										<mx:AdvancedDataGrid width="100%" height="100%" dataProvider="{arrWaterMeters}"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+											<mx:columns>
+												<mx:AdvancedDataGridColumn dataField="MeterNumber" headerText="Meter No." sortable="true" visible="true" />
+											</mx:columns>
+										</mx:AdvancedDataGrid>
+									</mx:FormItem>
+								</mx:Form>
+							</s:VGroup>
+						</s:NavigatorContent>
+						
+						<s:NavigatorContent id="ncStormWater" backgroundColor="haloSilver" label="STORMWATER">
+							<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
+								<s:Label text="BMPs" />
+								<mx:AdvancedDataGrid width="95%" height="100%"  
+													 horizontalScrollPolicy="off"
+													 verticalScrollPolicy="auto" selectable="true"
+													 dataProvider="{arrcBMPs}">
+									<mx:columns>
+										<mx:AdvancedDataGridColumn headerText="BMP Type" dataField="Type" sortable="true" visible="true" width="{spMain.width / 4}"/>
+										<mx:AdvancedDataGridColumn headerText="BMP Location" dataField="Location" sortable="true" visible="true" width="{spMain.width / 2}" />
+										<mx:AdvancedDataGridColumn headerText="Covenant Number" dataField="CovenantNumber" sortable="true" visible="true" width="{spMain.width / 4}" />
+									</mx:columns>
+								</mx:AdvancedDataGrid>
+								<mx:AdvancedDataGrid width="95%" height="100%"  
+													 horizontalScrollPolicy="off"
+													 verticalScrollPolicy="auto" selectable="true"
+													 dataProvider="{acBMPPermits}">
+									<mx:columns> 
+										<mx:AdvancedDataGridColumn headerText="Project Name" dataField="ProjectName" sortable="true" visible="true"/>
+										<mx:AdvancedDataGridColumn headerText="Priority" dataField="Priority" sortable="true" visible="true" />
+									</mx:columns>
+								</mx:AdvancedDataGrid>
+								<mx:Form  width="100%" height="10%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+									<mx:FormItem label="Priority Project Status:" width="350" height="100">
+										<mx:Text id="lblpermitpriority" text="{strPermitProritu}"/>
+									</mx:FormItem>
+								</mx:Form>
+							</s:VGroup>
+							
+						</s:NavigatorContent>	
+						
+						<s:NavigatorContent id="Fire" backgroundColor="haloSilver" label="PUBLIC SAFETY" >
+							<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
+								<mx:Form  width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+									
+									
+									<mx:Spacer height="10"/>
+									<mx:FormItem label="Public Safety Grid Sheet:">
+										<mx:Text id="fireGrid" width="200" text="{txtFireGrid}"/>
+									</mx:FormItem>
+									<mx:FormItem label="Fire PrePlan:">
+										<mx:Text id="firePP" width="200" text="{txtFirePrePlan}"/>
+									</mx:FormItem>
+									<mx:FormItem label="High Fire Hazard?">
+										<mx:Text id="fireHH" width="200" text="{txtFireHH}"/>
+									</mx:FormItem>
+									<mx:FormItem label="Sheriff Evacuation Area:">
+										<mx:Text id="EvacArea" width="200" text="{txtEvacArea}"/>
+									</mx:FormItem>
+									<mx:FormItem label="Sheriff Knox Box:">
+										<mx:Text id="KnoxBox" width="200" text="{txtSheriffKnox}"/>
+									</mx:FormItem>
+									<mx:FormItem label="Fire Station(s) within 3.5">
+									</mx:FormItem>
+									<mx:FormItem label=" Minute Response Zone:" width="350" height="100">
+										<mx:AdvancedDataGrid dataProvider="{arr3MinZone}" width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+											<mx:columns>
+												<mx:AdvancedDataGridColumn dataField="FireStation" headerText="Station Number" sortable="true" visible="true" />
+											</mx:columns>
+										</mx:AdvancedDataGrid>
+									</mx:FormItem>
+								</mx:Form>
+							</s:VGroup>
+						</s:NavigatorContent>
+						
+						<s:NavigatorContent id="Zoning" backgroundColor="haloSilver" label="ZONING">
+							<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
+								<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+									
+									<mx:FormItem label="General Plan Zoning:">
+										<mx:Text id="zoneGP" width="100" text="{txtGPZone}"/>
+									</mx:FormItem>
+									<mx:FormItem label="Base Zoning:">
+										<mx:Text id="zoneBP" width="100" text="{txtBaseZoning}"/>
+									</mx:FormItem>
+									<mx:FormItem label="Specific Plan Zoning:">
+										<mx:Text id="zoneSP" width="100" text="{txtSpecificZone}"/>
+									</mx:FormItem>
+									<s:VGroup   verticalAlign="middle" width="90%" horizontalAlign="center">
+										<s:Button id="btnZoningDetails" label="For more detailed information, click here" click="btnZoningDetails_clickHandler(event)"/>
+									</s:VGroup>
+								</mx:Form>
+								
+							</s:VGroup>
+						</s:NavigatorContent>
+						
+						<!--			<s:NavigatorContent id="NearbyAmenities" backgroundColor="haloSilver" label="NEARBY AMENITIES" >
+						<s:VGroup  width="100%" height="100%"   paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
+						<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+						
+						<mx:FormItem label="Parks and Beaches within 1 mile:" width="350" height="100">
+						<mx:AdvancedDataGrid width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
 						<mx:columns>
-							<mx:AdvancedDataGridColumn headerText="BMP Type" dataField="Type" sortable="true" visible="true" width="{spMain.width / 4}"/>
-							<mx:AdvancedDataGridColumn headerText="BMP Location" dataField="Location" sortable="true" visible="true" width="{spMain.width / 2}" />
-							<mx:AdvancedDataGridColumn headerText="Covenant Number" dataField="CovenantNumber" sortable="true" visible="true" width="{spMain.width / 4}" />
+						<mx:AdvancedDataGridColumn headerText="Park Name" sortable="true" visible="true" />
 						</mx:columns>
-					</mx:AdvancedDataGrid>
-					<mx:AdvancedDataGrid width="95%" height="100%"  
-										 horizontalScrollPolicy="off"
-										 verticalScrollPolicy="auto" selectable="true"
-										 dataProvider="{acBMPPermits}">
-						<mx:columns> 
-							<mx:AdvancedDataGridColumn headerText="Project Name" dataField="ProjectName" sortable="true" visible="true"/>
-							<mx:AdvancedDataGridColumn headerText="Priority" dataField="Priority" sortable="true" visible="true" />
-						</mx:columns>
-					</mx:AdvancedDataGrid>
-					<mx:Form  width="100%" height="10%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
-						<mx:FormItem label="Priority Project Status:" width="350" height="100">
-							<mx:Text id="lblpermitpriority" text="{strPermitProritu}"/>
+						</mx:AdvancedDataGrid>
 						</mx:FormItem>
-					</mx:Form>
-				</s:VGroup>
-					
-			</s:NavigatorContent>	
-			
-			<s:NavigatorContent id="Fire" backgroundColor="haloSilver" label="PUBLIC SAFETY" >
-				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10" >
-					<mx:Form  width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
+						<mx:FormItem label="Trailes within 1 mile:" width="350" height="100">
+						<mx:AdvancedDataGrid width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+						<mx:columns>
+						<mx:AdvancedDataGridColumn headerText="Trail Name" sortable="true" visible="true" />
+						</mx:columns>
+						</mx:AdvancedDataGrid>
+						</mx:FormItem>
+						<mx:FormItem label="Schools within 1 mile:" width="350" height="100">
+						<mx:AdvancedDataGrid width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+						<mx:columns>
+						<mx:AdvancedDataGridColumn headerText="School Name" sortable="true" visible="true" />
+						</mx:columns>
+						</mx:AdvancedDataGrid>
+						</mx:FormItem>
+						<mx:FormItem label="Points of Interest within 1 mile:" width="350" height="100">
+						<mx:AdvancedDataGrid width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
+						<mx:columns>
+						<mx:AdvancedDataGridColumn headerText="POI Name" sortable="true" visible="true" />
+						</mx:columns>
+						</mx:AdvancedDataGrid>
+						</mx:FormItem>
+						</mx:Form>
+						</s:VGroup>
+						</s:NavigatorContent>-->
+					</mx:ViewStack>
+				</s:NavigatorContent>
+				
+				<s:NavigatorContent id="tocPanel" label="Legend" width="{spMain.width}" >
+					<s:Group>
+						<EncComponents:TOCWidget id="siteprofilertoc" 
+												 map="{map}" 
+												 title = "Map Legend" 
+												 width="{spMain.width - 30}" x="0" y="0"
+												 allowClose="false"
+												 allowDrag="false"
+												 allowResize="true"
+												 allowMaximize="false"
+												 allowMinimize="false"
+												 Cinfig="{TOCConfig}"
+												 verticalScrollPolicy="auto"
+												 height="{spContainer.height}"
+												 />
+					</s:Group>
 
-	
-						<mx:Spacer height="10"/>
-						<mx:FormItem label="Public Safety Grid Sheet:">
-							<mx:Text id="fireGrid" width="200" text="{txtFireGrid}"/>
-						</mx:FormItem>
-						<mx:FormItem label="Fire PrePlan:">
-							<mx:Text id="firePP" width="200" text="{txtFirePrePlan}"/>
-						</mx:FormItem>
-						<mx:FormItem label="High Fire Hazard?">
-							<mx:Text id="fireHH" width="200" text="{txtFireHH}"/>
-						</mx:FormItem>
-						<mx:FormItem label="Sheriff Evacuation Area:">
-							<mx:Text id="EvacArea" width="200" text="{txtEvacArea}"/>
-						</mx:FormItem>
-						<mx:FormItem label="Sheriff Knox Box:">
-							<mx:Text id="KnoxBox" width="200" text="{txtSheriffKnox}"/>
-						</mx:FormItem>
-						<mx:FormItem label="Fire Station(s) within 3.5">
-						</mx:FormItem>
-						<mx:FormItem label=" Minute Response Zone:" width="350" height="100">
-							<mx:AdvancedDataGrid dataProvider="{arr3MinZone}" width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
-								<mx:columns>
-									<mx:AdvancedDataGridColumn dataField="FireStation" headerText="Station Number" sortable="true" visible="true" />
-								</mx:columns>
-							</mx:AdvancedDataGrid>
-						</mx:FormItem>
-					</mx:Form>
-				</s:VGroup>
-			</s:NavigatorContent>
-			
-			<s:NavigatorContent id="Zoning" backgroundColor="haloSilver" label="ZONING">
-				<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
-					<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
 					
-					<mx:FormItem label="General Plan Zoning:">
-						<mx:Text id="zoneGP" width="100" text="{txtGPZone}"/>
-					</mx:FormItem>
-					<mx:FormItem label="Base Zoning:">
-						<mx:Text id="zoneBP" width="100" text="{txtBaseZoning}"/>
-					</mx:FormItem>
-					<mx:FormItem label="Specific Plan Zoning:">
-						<mx:Text id="zoneSP" width="100" text="{txtSpecificZone}"/>
-					</mx:FormItem>
-					<s:VGroup   verticalAlign="middle" width="90%" horizontalAlign="center">
-						<s:Button id="btnZoningDetails" label="For more detailed information, click here" click="btnZoningDetails_clickHandler(event)"/>
-					</s:VGroup>
-					</mx:Form>
-			
-				</s:VGroup>
-			</s:NavigatorContent>
-			
-<!--			<s:NavigatorContent id="NearbyAmenities" backgroundColor="haloSilver" label="NEARBY AMENITIES" >
-				<s:VGroup  width="100%" height="100%"   paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
-					<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
 					
-					<mx:FormItem label="Parks and Beaches within 1 mile:" width="350" height="100">
-						<mx:AdvancedDataGrid width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
-							<mx:columns>
-								<mx:AdvancedDataGridColumn headerText="Park Name" sortable="true" visible="true" />
-							</mx:columns>
-						</mx:AdvancedDataGrid>
-					</mx:FormItem>
-					<mx:FormItem label="Trailes within 1 mile:" width="350" height="100">
-						<mx:AdvancedDataGrid width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
-							<mx:columns>
-								<mx:AdvancedDataGridColumn headerText="Trail Name" sortable="true" visible="true" />
-							</mx:columns>
-						</mx:AdvancedDataGrid>
-					</mx:FormItem>
-					<mx:FormItem label="Schools within 1 mile:" width="350" height="100">
-						<mx:AdvancedDataGrid width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
-							<mx:columns>
-								<mx:AdvancedDataGridColumn headerText="School Name" sortable="true" visible="true" />
-							</mx:columns>
-						</mx:AdvancedDataGrid>
-					</mx:FormItem>
-					<mx:FormItem label="Points of Interest within 1 mile:" width="350" height="100">
-						<mx:AdvancedDataGrid width="100%" height="100%"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
-							<mx:columns>
-								<mx:AdvancedDataGridColumn headerText="POI Name" sortable="true" visible="true" />
-							</mx:columns>
-						</mx:AdvancedDataGrid>
-					</mx:FormItem>
-					</mx:Form>
-				</s:VGroup>
-			</s:NavigatorContent>-->
-		</mx:ViewStack>
+				</s:NavigatorContent>
+				
+			</mx:ViewStack> 
+		</s:VGroup>
 
 	</EncComponents:SlidingPanel>
 		
@@ -2521,6 +2556,7 @@
 								   graphicAdd="fLayer_graphicAddHandler(event)"
 								   mode="snapshot"
 								   visible="false"
+								   name="Parks"
 								   outFields="[Name,Address,GP_Subtype, URL]" load="FeatureLayer_loadHandler(event)"
 								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/5">
 					
@@ -2529,6 +2565,7 @@
 								   graphicAdd="fLayer_graphicAddHandler(event)"
 								   mode="snapshot"
 								   visible="false"
+								   name="Points Of Interest"
 								   outFields="[Name,Location, URL]" load="FeatureLayer_loadHandler(event)"
 								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/1" >
 				</esri:FeatureLayer>
@@ -2536,6 +2573,7 @@
 								   graphicAdd="fLayer_graphicAddHandler(event)"
 								   mode="snapshot"
 								   visible="false"
+								   name="Schools"
 								   outFields="[Name,Address,Subtype,IsPrivate, URL]" load="FeatureLayer_loadHandler(event)"
 								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/2">
 				</esri:FeatureLayer>
@@ -2543,17 +2581,20 @@
 								   graphicAdd="fLayer_graphicAddHandler(event)"
 								   mode="snapshot"
 								   visible="false"
+								   name="Churches"
 								   outFields="[Name,Address, URL]" load="FeatureLayer_loadHandler(event)"
 								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/3">
 				</esri:FeatureLayer>
 				<esri:FeatureLayer id="TrailsFL"
+								   name="Trails"
 								   graphicAdd="fLayer_graphicAddHandler(event)"
 								   mode="snapshot"
 								   visible="false"
 								   outFields="[TrailNumber,TrailUse]" load="FeatureLayer_loadHandler(event)"
 								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/4">
 				</esri:FeatureLayer>
-				<esri:FeatureLayer id="FireStationFL"
+				<esri:FeatureLayer id="FireStation"
+								   name="Fire Station"
 								   graphicAdd="fLayer_graphicAddHandler(event)"
 								   mode="snapshot"
 								   visible="false"
