@@ -1606,12 +1606,12 @@
 								{
 									txtPlanName = arrcPlans[i].attributes.Name;
 									txtLglDate = new Date(arrcPlans[i].attributes.LegalDate).toDateString();  
-									txtPCntyRecording = arrcPlans[i].attributes.RecordingYear + " - " + arrcPlans[i].attributes.RecordingSequence
+									txtPCntyRecording = arrcPlans[i].attributes.RecordingYear + " - " + arrcPlans[i].attributes.RecordingNumber;
 									txtSurveyDate = new Date(arrcPlans[i].attributes.SurveyDate).toDateString(); 
-									txtSurveyor = arrcPlans[i].attributes.Surveyor 
-									txtCompany = arrcPlans[i].attributes.Company 
-									txtPDescription = arrcPlans[i].attributes.Description 
-									txtPResDevel = arrcPlans[i].attributes.IsPlanResidentialDevelopment 
+									txtSurveyor = arrcPlans[i].attributes.Surveyor ;
+									txtCompany = arrcPlans[i].attributes.Company; 
+									txtPDescription = arrcPlans[i].attributes.Description; 
+									txtPResDevel = arrcPlans[i].attributes.IsPlanResidentialDevelopment; 
 								}
 							}
 						}
@@ -1804,7 +1804,7 @@
 				addLayer(getLayerInfoID(DistrictsService.layerInfos,"Districts & Services"),DistrictsService);*/
 			}
 			
-
+		
 		]]>
 	
 	</fx:Script>
@@ -1813,7 +1813,7 @@
 	
 
 		<fx:XML id="TOCConfig" source="/SiteProfiler3/TOCWidget.xml"/>
-		<esri:NavigationTool id="navToolbar" map="{map}"/>
+		<esri:NavigationTool id="navToolbar" map="{map}"  />
 		
 		<esri:Locator id="AddressLocator"
 					  url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/GISSQL_Address/GeocodeServer"/>
@@ -1933,7 +1933,7 @@
 								returnGeometry="false"
 								/>
 		<esri:RelationshipQuery id="relatedPlans"
-								outFields="[OBJECTID, Name, LegalDate, RecordingYear, RecordingSequence, SurveyDate, Surveyor, Company, Description, IsPlanResidentialDevelopment]"
+								outFields="[OBJECTID, Name, LegalDate, RecordingYear, RecordingNumber, SurveyDate, Surveyor, Company, Description, IsPlanResidentialDevelopment]"
 								returnGeometry="false"
 								/>
 	</fx:Declarations>
