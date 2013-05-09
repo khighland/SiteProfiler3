@@ -2552,6 +2552,19 @@
 												   load="{DistrictsService_loadHandler(event)}">
 
 				</esri:ArcGISDynamicMapServiceLayer>
+				<esri:ArcGISDynamicMapServiceLayer id="BluffService" url="http://gis-ddowling1/arcgis/rest/services/Secured/bluff_sec_test/MapServer" 
+												   proxyURL="http://gis-ddowling1/Proxy/proxy.ashx"
+												   visible="true" 
+												   imageFormat="png32"
+												   >
+					
+				</esri:ArcGISDynamicMapServiceLayer>
+<!--				<esri:ArcGISDynamicMapServiceLayer id="BluffService" url="http://gis-ddowling1/arcgis/rest/services/Secured/bluff_sec_test/MapServer" 
+												   token="jR1ovKYAIx72KKusQ7HkvUqHdiedS1JZrRnhkYFbCczOt0bwVwSuhUH2_Opnu_8nfMB4QElrCKqgXVdZsEf8ui0aWgrVj4o_rCvJjxSCxX4_zTYOuOCXYg2_B6UnpdV7K3uzuXm2D7XMxdbI5eJK3Q.."
+												   visible="true" 
+												   imageFormat="png32"
+												   />-->
+
 				<esri:FeatureLayer id="ParksFL"
 								   graphicAdd="fLayer_graphicAddHandler(event)"
 								   mode="snapshot"
