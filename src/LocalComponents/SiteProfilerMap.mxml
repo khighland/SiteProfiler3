@@ -2500,7 +2500,11 @@
 				<esri:ArcGISTiledMapServiceLayer id="Basemap" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/unsecured/Basemap/MapServer" visible="true"/>
 				<esri:ArcGISTiledMapServiceLayer id="BasemapPlus" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/unsecured/BasemapPlus/MapServer" visible="false" load="BasemapPlus_loadHandler(event)"/>
 				<esri:GraphicsLayer id="graphicsLayer" graphicProvider="{queryParcels.executeLastResult.features}" visible="true"/>
+<!--				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://gisweb:9231/internal/rest/services/Secured/SiteProfiler/MapServer" 
+												   visible="true" load="Addresses_loadHandler(event)" 
+												   imageFormat="png32" />-->
 				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://gisweb:9231/internal/rest/services/Secured/SiteProfiler/MapServer" 
+												   token="jR1ovKYAIx72KKusQ7HkvV3c0jvLaa31544LjO6CXnzSWke53garY1qLa2Aq18VWIIi5-9ZHSRv4bwF_2799yQ.."
 												   visible="true" load="Addresses_loadHandler(event)" 
 												   imageFormat="png32" />
 
