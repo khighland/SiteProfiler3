@@ -1863,7 +1863,8 @@
 		
 		
 		<esri:IdentifyTask id="SiteProfiler_Identify" 
-						   url="http://gisweb:9231/Internal/rest/services/secured/SiteProfiler/MapServer"
+						   url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer"
+						   token="jR1ovKYAIx72KKusQ7HkvVFyaMTQW1LapnfA1kpcm_-IJPRHgkfG7CKp15lQargvYavv_aClO6ctlUSBiX94yOMSvT_aNMw7ttUklvSD6nbPBCsCEmguayfwoyHtq8fW"
 						   concurrency="last"
 						   showBusyCursor="true" />
 		
@@ -1887,7 +1888,8 @@
 		
 		<esri:QueryTask id="queryAddressesTask"
 						showBusyCursor="true"
-						url="http://gisweb:9231/Internal/rest/services/Secured/SiteProfiler/MapServer/"
+						url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer/"
+						token="jR1ovKYAIx72KKusQ7HkvVFyaMTQW1LapnfA1kpcm_-IJPRHgkfG7CKp15lQargvYavv_aClO6ctlUSBiX94yOMSvT_aNMw7ttUklvSD6nbPBCsCEmguayfwoyHtq8fW"
 						useAMF="true">
 		</esri:QueryTask>
 		
@@ -1918,9 +1920,11 @@
 		
 
 		
-		<esri:QueryTask id="BMPQuery" url="http://gisweb:9231/Internal/rest/services/Secured/SiteProfiler/MapServer/" 
+		<esri:QueryTask id="BMPQuery" url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer/" 
+						token="jR1ovKYAIx72KKusQ7HkvVFyaMTQW1LapnfA1kpcm_-IJPRHgkfG7CKp15lQargvYavv_aClO6ctlUSBiX94yOMSvT_aNMw7ttUklvSD6nbPBCsCEmguayfwoyHtq8fW"
 						showBusyCursor="true" useAMF="true" />
-		<esri:QueryTask id="SubdivisionQuery" url="http://gisweb:9231/Internal/rest/services/secured/SiteProfiler/MapServer/" 
+		<esri:QueryTask id="SubdivisionQuery" url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer/" 
+						token="jR1ovKYAIx72KKusQ7HkvVFyaMTQW1LapnfA1kpcm_-IJPRHgkfG7CKp15lQargvYavv_aClO6ctlUSBiX94yOMSvT_aNMw7ttUklvSD6nbPBCsCEmguayfwoyHtq8fW"
 						showBusyCursor="true" useAMF="true" />
 		
 		<esri:RelationshipQuery id="relatedBusinesses"
@@ -2503,8 +2507,8 @@
 <!--				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://gisweb:9231/internal/rest/services/Secured/SiteProfiler/MapServer" 
 												   visible="true" load="Addresses_loadHandler(event)" 
 												   imageFormat="png32" />-->
-				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://gisweb:9231/internal/rest/services/Secured/SiteProfiler/MapServer" 
-												   token="jR1ovKYAIx72KKusQ7HkvV3c0jvLaa31544LjO6CXnzSWke53garY1qLa2Aq18VWIIi5-9ZHSRv4bwF_2799yQ.."
+				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer" 
+												   token="jR1ovKYAIx72KKusQ7HkvVFyaMTQW1LapnfA1kpcm_-IJPRHgkfG7CKp15lQargvYavv_aClO6ctlUSBiX94yOMSvT_aNMw7ttUklvSD6nbPBCsCEmguayfwoyHtq8fW"
 												   visible="true" load="Addresses_loadHandler(event)" 
 												   imageFormat="png32" />
 
@@ -2512,6 +2516,10 @@
 				<esri:GraphicsLayer id="glAddress" graphicProvider="{arrayAddresses}" visible="true"/>
 				<esri:GraphicsLayer id="glSubdivision" graphicProvider="{arraySubdivResult}" visible="false"/>
 				<esri:GraphicsLayer id="glPermits" graphicProvider="{arrayPermits}" visible="false" alpha=".66" symbol="{symTransparent}"/>
+<!--				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/MapServer" 
+												   visible="false" 
+												   imageFormat="png32"
+												   load="{DistrictsService_loadHandler(event)}">-->
 				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/MapServer" 
 												   visible="false" 
 												   imageFormat="png32"
