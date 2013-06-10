@@ -4,6 +4,9 @@
 	xmlns:mx="library://ns.adobe.com/flex/mx"
 	xmlns:s="library://ns.adobe.com/flex/spark"
 	xmlns:LocalComponents="LocalComponents.*" 
+	preinitialize="application1_preinitializeHandler(event)"
+	xmlns:EncComponents="EncComponents.*"
+	creationPolicy="none"
 	height="99%" width="99%"
 	>
 	<s:layout>
@@ -16,11 +19,38 @@
 		
 		
 	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import EncComponents.TokenGrabber;
+			import EncComponents.TokenGrabberEvent;
+			
+			private var tokengetter:TokenGrabber = new TokenGrabber("SiteProfiler");
+			[Bindable]
+			private var myTok:String;
+			
+			protected function application1_preinitializeHandler(event:FlexEvent):void
+			{
+				tokengetter  = new TokenGrabber("SiteProfiler");
+				tokengetter.addEventListener(TokenGrabberEvent.XML_LOADED,tokenloaded);
+				
+			}
+			
+			protected function tokenloaded(event:Event):void
+			{
+				myTok = tokengetter.appT;
+				createDeferredContent();
+				
+			}
+			
+		]]>
+	</fx:Script>
 	<s:Rect width="100%" height="100%">
 		
 	</s:Rect>
-	<s:Group width="100%" height="100%" clipAndEnableScrolling="true">
-		<LocalComponents:SiteProfilerMap id="Profiler1" width="100%" height="100%" clipAndEnableScrolling="false"/>
+	<s:Group width="100%" height="100%" clipAndEnableScrolling="true" >
+		<LocalComponents:SiteProfilerMap id="Profiler1" width="100%" height="100%" clipAndEnableScrolling="false" myTok="{myTok}" />
 	</s:Group>
 	
 	

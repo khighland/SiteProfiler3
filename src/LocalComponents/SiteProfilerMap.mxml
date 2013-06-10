@@ -5,7 +5,8 @@
 	xmlns:mx="library://ns.adobe.com/flex/mx" 
 	xmlns:esri="http://www.esri.com/2008/ags" 
 	xmlns:EncComponents="EncComponents.*"
-	creationComplete="init()" width="{parentApplication.width}" height="100%">
+	creationComplete="init()" width="{parentApplication.width}" height="100%"
+	preinitialize="group1_preinitializeHandler(event)" >
 	<s:layout> 
 		<s:BasicLayout />  
 	</s:layout>
@@ -67,6 +68,8 @@
 			import spark.effects.animation.RepeatBehavior;
 			import spark.events.IndexChangeEvent;
 			
+			import EncComponents.TokenGrabber;
+			import EncComponents.TokenGrabberEvent;
 			import EncComponents.WebForm;
 			import EncComponents.helperClass;
 			import EncComponents.splashScreen;
@@ -75,6 +78,8 @@
 			
 			[Bindable]
 			private var aLayersTOC:ArrayCollection = new ArrayCollection;
+			[Bindable]
+			private var key:String;
 			
 			[Bindable]
 			private var fabricAttributes:ArrayCollection = new ArrayCollection;
@@ -207,6 +212,9 @@
 			// Embed the cursor symbol.
 			[Embed(source="/../assets/icons/CursorHand.png")]
 			private var waitCursorSymbol:Class;
+			private var tokengetter:TokenGrabber = new TokenGrabber("SiteProfiler");
+			[Bindable]
+			public var myTok:String;
 			
 	private function init():void
 	{
@@ -1805,6 +1813,19 @@
 			}
 			
 		
+			protected function group1_preinitializeHandler(event:FlexEvent):void
+			{
+				//tokengetter  = new TokenGrabber("SiteProfiler");
+				//tokengetter.addEventListener(TokenGrabberEvent.XML_LOADED,tokenloaded);
+			}
+			
+			protected function tokenloaded(event:Event):void
+			{
+				//myTok = tokengetter.appT;
+				//super.initialized=true;
+				
+			}
+			
 		]]>
 	
 	</fx:Script>
@@ -1864,7 +1885,7 @@
 		
 		<esri:IdentifyTask id="SiteProfiler_Identify" 
 						   url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer"
-						   token="jR1ovKYAIx72KKusQ7HkvVFyaMTQW1LapnfA1kpcm_-IJPRHgkfG7CKp15lQargvYavv_aClO6ctlUSBiX94yOMSvT_aNMw7ttUklvSD6nbPBCsCEmguayfwoyHtq8fW"
+						   token="{myTok}"
 						   concurrency="last"
 						   showBusyCursor="true" />
 		
@@ -1889,7 +1910,7 @@
 		<esri:QueryTask id="queryAddressesTask"
 						showBusyCursor="true"
 						url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer/"
-						token="jR1ovKYAIx72KKusQ7HkvVFyaMTQW1LapnfA1kpcm_-IJPRHgkfG7CKp15lQargvYavv_aClO6ctlUSBiX94yOMSvT_aNMw7ttUklvSD6nbPBCsCEmguayfwoyHtq8fW"
+						token="{myTok}"
 						useAMF="true">
 		</esri:QueryTask>
 		
@@ -1921,10 +1942,10 @@
 
 		
 		<esri:QueryTask id="BMPQuery" url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer/" 
-						token="jR1ovKYAIx72KKusQ7HkvVFyaMTQW1LapnfA1kpcm_-IJPRHgkfG7CKp15lQargvYavv_aClO6ctlUSBiX94yOMSvT_aNMw7ttUklvSD6nbPBCsCEmguayfwoyHtq8fW"
+						token="{myTok}"
 						showBusyCursor="true" useAMF="true" />
 		<esri:QueryTask id="SubdivisionQuery" url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer/" 
-						token="jR1ovKYAIx72KKusQ7HkvVFyaMTQW1LapnfA1kpcm_-IJPRHgkfG7CKp15lQargvYavv_aClO6ctlUSBiX94yOMSvT_aNMw7ttUklvSD6nbPBCsCEmguayfwoyHtq8fW"
+						token="{myTok}"
 						showBusyCursor="true" useAMF="true" />
 		
 		<esri:RelationshipQuery id="relatedBusinesses"
@@ -2460,7 +2481,7 @@
 
 
 		
-	<s:VGroup  width="100%" height="100%" id="appMain" gap="1">
+	<s:VGroup  width="100%" height="100%" id="appMain" gap="1" >
 	
 		<s:VGroup id="header"  width="{parentApplication.width}">
 			<mx:HBox horizontalGap="0" width="100%" id="hbHeader"> 
@@ -2476,7 +2497,7 @@
 		</s:VGroup>	
 
 
-		<s:Group width="{parentApplication.width}" height="100%" id="cnvMap">
+		<s:Group width="{parentApplication.width}" height="100%" id="cnvMap" >
 			
 			<esri:Map id="map" logoVisible="false" rubberbandZoomEnabled="true"  mapClick="onMapClicked(event)" extentChange="onExtentChanged(event)" 
 				panEnabled="true" openHandCursorVisible="false"   >
@@ -2508,7 +2529,7 @@
 												   visible="true" load="Addresses_loadHandler(event)" 
 												   imageFormat="png32" />-->
 				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer" 
-												   token="jR1ovKYAIx72KKusQ7HkvVFyaMTQW1LapnfA1kpcm_-IJPRHgkfG7CKp15lQargvYavv_aClO6ctlUSBiX94yOMSvT_aNMw7ttUklvSD6nbPBCsCEmguayfwoyHtq8fW"
+												   token="{myTok}"
 												   visible="true" load="Addresses_loadHandler(event)" 
 												   imageFormat="png32" />
 
