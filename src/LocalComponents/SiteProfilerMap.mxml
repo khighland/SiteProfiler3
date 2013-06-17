@@ -2528,7 +2528,7 @@
 <!--				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://gisweb:9231/internal/rest/services/Secured/SiteProfiler/MapServer" 
 												   visible="true" load="Addresses_loadHandler(event)" 
 												   imageFormat="png32" />-->
-				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer" 
+				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer" 
 												   token="{myTok}"
 												   visible="true" load="Addresses_loadHandler(event)" 
 												   imageFormat="png32" />
