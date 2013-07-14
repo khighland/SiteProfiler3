@@ -212,7 +212,7 @@
 			// Embed the cursor symbol.
 			[Embed(source="/../assets/icons/CursorHand.png")]
 			private var waitCursorSymbol:Class;
-			private var tokengetter:TokenGrabber = new TokenGrabber("SiteProfiler");
+			//private var tokengetter:TokenGrabber = new TokenGrabber("SiteProfiler");
 			[Bindable]
 			public var myTok:String;
 			
@@ -755,7 +755,7 @@
 						Street: addr
 					}
 				var myOutFields:Array = ["*"];
-				var intersectionLocator:Locator = new Locator("http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/GISSQL_Streets/GeocodeServer");
+				var intersectionLocator:Locator = new Locator("http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/GISSQL_Streets/GeocodeServer");
 				intersectionLocator.addressToLocations(addressObjectAddress,myOutFields,new AsyncResponder(onGeoResult, onGeoFault));
 			}
 		
@@ -1837,10 +1837,10 @@
 		<esri:NavigationTool id="navToolbar" map="{map}"  />
 		
 		<esri:Locator id="AddressLocator"
-					  url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/GISSQL_Address/GeocodeServer"/>
+					  url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/GISSQL_Address/GeocodeServer"/>
 		
 		<esri:Locator id="APNLocator"
-					  url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/GISSQL_APN/GeocodeServer"/>
+					  url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/GISSQL_APN/GeocodeServer"/>
 		
 		<!-- symbol to store geocode result so it can be reprojected -->
 		<esri:SimpleMarkerSymbol id="smsIdentify" style="diamond" color="0x00FF00" size="15"/>
@@ -1884,7 +1884,7 @@
 		
 		
 		<esri:IdentifyTask id="SiteProfiler_Identify" 
-						   url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer"
+						   url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer"
 						   token="{myTok}"
 						   concurrency="last"
 						   showBusyCursor="true" />
@@ -1898,18 +1898,18 @@
 							  concurrency="last"
 							  projectComplete="onProjectComplete(event)"
 							  fault="onProjectFault(event)"
-							  url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Geometry/GeometryServer"/>
+							  url="http://coemapservices.encinitasca.gov/encgis/rest/services/Utilities/Geometry/GeometryServer"/>
 		
 		<esri:QueryTask id="queryParcels"
 						showBusyCursor="true"						
-						url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/BasemapPlus/MapServer"
+						url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/BasemapPlus/MapServer"
 						executeComplete="onQueryParcelComplete(event)" 
 						useAMF="true">		
 		</esri:QueryTask>
 		
 		<esri:QueryTask id="queryAddressesTask"
 						showBusyCursor="true"
-						url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer/"
+						url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer/"
 						token="{myTok}"
 						useAMF="true">
 		</esri:QueryTask>
@@ -1941,10 +1941,10 @@
 		
 
 		
-		<esri:QueryTask id="BMPQuery" url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer/" 
+		<esri:QueryTask id="BMPQuery" url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer/" 
 						token="{myTok}"
 						showBusyCursor="true" useAMF="true" />
-		<esri:QueryTask id="SubdivisionQuery" url="http://gis-ddowling1/arcgis/rest/services/Secured/SiteProfiler/MapServer/" 
+		<esri:QueryTask id="SubdivisionQuery" url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer/" 
 						token="{myTok}"
 						showBusyCursor="true" useAMF="true" />
 		
@@ -2520,10 +2520,10 @@
 						<esri:SpatialReference wkid="102100"/> 
 					</esri:Extent>
 				</esri:extent> -->
-				<esri:ArcGISTiledMapServiceLayer id="ShadedRelief"   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/unsecured/Shaded_Relief_2009/MapServer" visible="true" alpha="0"/>
-				<esri:ArcGISTiledMapServiceLayer id="Imagery"   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/unsecured/Imagery_2009_Web/MapServer" visible="true" alpha="1"/>
-				<esri:ArcGISTiledMapServiceLayer id="Basemap" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/unsecured/Basemap/MapServer" visible="true"/>
-				<esri:ArcGISTiledMapServiceLayer id="BasemapPlus" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/unsecured/BasemapPlus/MapServer" visible="false" load="BasemapPlus_loadHandler(event)"/>
+				<esri:ArcGISTiledMapServiceLayer id="ShadedRelief"   url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/Shaded_Relief_2009/MapServer" visible="true" alpha="0"/>
+				<esri:ArcGISTiledMapServiceLayer id="Imagery"   url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/Imagery_2009_Web/MapServer" visible="true" alpha="1"/>
+				<esri:ArcGISTiledMapServiceLayer id="Basemap" url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/Basemap/MapServer" visible="true" />
+				<esri:ArcGISTiledMapServiceLayer id="BasemapPlus" url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/BasemapPlus/MapServer" visible="false" load="BasemapPlus_loadHandler(event)"/>
 				<esri:GraphicsLayer id="graphicsLayer" graphicProvider="{queryParcels.executeLastResult.features}" visible="true"/>
 <!--				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://gisweb:9231/internal/rest/services/Secured/SiteProfiler/MapServer" 
 												   visible="true" load="Addresses_loadHandler(event)" 
@@ -2537,11 +2537,11 @@
 				<esri:GraphicsLayer id="glAddress" graphicProvider="{arrayAddresses}" visible="true"/>
 				<esri:GraphicsLayer id="glSubdivision" graphicProvider="{arraySubdivResult}" visible="false"/>
 				<esri:GraphicsLayer id="glPermits" graphicProvider="{arrayPermits}" visible="false" alpha=".66" symbol="{symTransparent}"/>
-<!--				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/MapServer" 
+<!--				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/DistrictsAndServices/MapServer" 
 												   visible="false" 
 												   imageFormat="png32"
 												   load="{DistrictsService_loadHandler(event)}">-->
-				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/MapServer" 
+				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/MapServer" 
 												   visible="false" 
 												   imageFormat="png32"
 												   load="{DistrictsService_loadHandler(event)}">
@@ -2553,7 +2553,7 @@
 								   visible="false"
 								   name="Parks"
 								   outFields="[Name,Address,GP_Subtype, URL]" load="FeatureLayer_loadHandler(event)"
-								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/5">
+								   url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/5">
 					
 				</esri:FeatureLayer>
 				<esri:FeatureLayer id="POIFL"
@@ -2562,7 +2562,7 @@
 								   visible="false"
 								   name="Points Of Interest"
 								   outFields="[Name,Location, URL]" load="FeatureLayer_loadHandler(event)"
-								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/1" >
+								   url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/1" >
 				</esri:FeatureLayer>
 				<esri:FeatureLayer id="PrivateSchoolFL"
 								   graphicAdd="fLayer_graphicAddHandler(event)"
@@ -2570,7 +2570,7 @@
 								   visible="false"
 								   name="Schools"
 								   outFields="[Name,Address,Subtype,IsPrivate, URL]" load="FeatureLayer_loadHandler(event)"
-								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/2">
+								   url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/2">
 				</esri:FeatureLayer>
 				<esri:FeatureLayer id="ChurchFL"
 								   graphicAdd="fLayer_graphicAddHandler(event)"
@@ -2578,7 +2578,7 @@
 								   visible="false"
 								   name="Churches"
 								   outFields="[Name,Address, URL]" load="FeatureLayer_loadHandler(event)"
-								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/3">
+								   url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/3">
 				</esri:FeatureLayer>
 				<esri:FeatureLayer id="TrailsFL"
 								   name="Trails"
@@ -2586,7 +2586,7 @@
 								   mode="snapshot"
 								   visible="false"
 								   outFields="[TrailNumber,TrailUse]" load="FeatureLayer_loadHandler(event)"
-								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/4">
+								   url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/4">
 				</esri:FeatureLayer>
 				<esri:FeatureLayer id="FireStation"
 								   name="Fire Station"
@@ -2594,7 +2594,7 @@
 								   mode="snapshot"
 								   visible="false"
 								   outFields="[StationNumber,Address]" load="FeatureLayer_loadHandler(event)"
-								   url="http://encmapservices.cityofencinitas.org/ArcGIS/rest/services/Unsecured/DistrictsAndServices/FeatureServer/6">
+								   url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/6">
 				</esri:FeatureLayer>
 			</esri:Map>
 		</s:Group>

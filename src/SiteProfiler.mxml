@@ -40,6 +40,7 @@
 			protected function tokenloaded(event:Event):void
 			{
 				myTok = tokengetter.appT;
+				//myTok = "oK9ysUo1nac5mYegiUU9BcEtaEZksFqNJuRW8g-BqYrN5RG5G3F1_B8qEVq0_smJv3MNuDEra9AG3DnsR4WWVg..";
 				createDeferredContent();
 				
 			}
