@@ -1771,7 +1771,7 @@
 
 			protected function btnLandRecsApp_clickHandler(event:MouseEvent):void
 			{
-				navigateToURL(new URLRequest( 'http://gisweb:9231/LandRecords?X=' + mpIDPoint.x + '&Y=' + mpIDPoint.y + '&start=extent&xmin=' + map.extent.xmin + '&ymin=' + map.extent.ymin + '&xmax=' + map.extent.xmax + '&ymax=' + map.extent.ymax ),"quote");
+				navigateToURL(new URLRequest( 'http://hyperion/LandRecords?X=' + mpIDPoint.x + '&Y=' + mpIDPoint.y + '&start=extent&xmin=' + map.extent.xmin + '&ymin=' + map.extent.ymin + '&xmax=' + map.extent.xmax + '&ymax=' + map.extent.ymax ),"quote");
 			}
 			
 			protected function fLayer_graphicAddHandler(event:GraphicEvent):void
@@ -2433,13 +2433,13 @@
 							<s:VGroup  width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
 								<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
 									
-									<mx:FormItem label="General Plan Zoning:">
+									<mx:FormItem label="General Plan:">
 										<mx:Text id="zoneGP" width="100" text="{txtGPZone}"/>
 									</mx:FormItem>
-									<mx:FormItem label="Base Zoning:">
+									<mx:FormItem label="Zoning:">
 										<mx:Text id="zoneBP" width="100" text="{txtBaseZoning}"/>
 									</mx:FormItem>
-									<mx:FormItem label="Specific Plan Zoning:">
+									<mx:FormItem label="Specific Plan:">
 										<mx:Text id="zoneSP" width="100" text="{txtSpecificZone}"/>
 									</mx:FormItem>
 									<s:VGroup   verticalAlign="middle" width="90%" horizontalAlign="center">
