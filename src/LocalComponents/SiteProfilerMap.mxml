@@ -556,7 +556,7 @@
 							//identifyParams.layerIds = [0,1,2,3];	
 							identifyParams.mapExtent= map.extent;
 							identifyParams.spatialReference= map.spatialReference;
-							identifyParams.tolerance=3;
+							identifyParams.tolerance=0;
 							SiteProfiler_Identify.execute(identifyParams, new AsyncResponder(onSiteProfileResult, onZoningFault,graphic)); 
 							
 						}
