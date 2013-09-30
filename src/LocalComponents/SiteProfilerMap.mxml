@@ -179,9 +179,9 @@
 			[Bindable]
 			private var txtSpecificZone:String;
 			[Bindable]
-			private var txtGPZone:String;
+			private var acGPZone:ArrayCollection = new ArrayCollection;
 			[Bindable]
-			private var txtBaseZoning:String;
+			private var acBaseZoning:ArrayCollection = new ArrayCollection;
 			[Bindable]
 			private var myParcelCursor:IViewCursor;
 			
@@ -952,12 +952,14 @@
 						
 					else if (result.layerName == "Encinitas Zoning")
 					{
-						txtBaseZoning = result.feature.attributes.ZoneDesignation;
+						//txtBaseZoning = result.feature.attributes.ZoneDesignation;
 						txtSpecificZone = result.feature.attributes.SpecificPlanName;
+						acBaseZoning.addItem({ZoneDesignation: result.feature.attributes.ZoneDesignation});
 					}
 					else if (result.layerName == "General Plan")
 					{
-						txtGPZone = result.feature.attributes.GPDesignation;
+						//txtGPZone = result.feature.attributes.GPDesignation;
+						acGPZone.addItem({"GP Designation": result.feature.attributes.GPDesignation});
 					}
  					else if (result.layerName == "Permit Areas")
 					{
@@ -1589,6 +1591,8 @@
 				arrcSewerEDU.removeAll();
 				arrcSewerPermits.removeAll();
 				arrcSubdiv.removeAll();
+				acGPZone.removeAll();
+				acBaseZoning.removeAll();
 			}
 
 
@@ -2434,10 +2438,12 @@
 								<mx:Form width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
 									
 									<mx:FormItem label="General Plan:">
-										<mx:Text id="zoneGP" width="100" text="{txtGPZone}"/>
+										<!--<mx:Text id="zoneGP" width="100" text="{txtGPZone}"/>-->
+										<mx:AdvancedDataGrid id="zoneGP"   width="100" dataProvider="{acGPZone}"  headerHeight="0" textAlign="left" rowCount="{acGPZone.length + 1}"/>
 									</mx:FormItem>
 									<mx:FormItem label="Zoning:">
-										<mx:Text id="zoneBP" width="100" text="{txtBaseZoning}"/>
+										<!--<mx:Text id="zoneBP" width="100" text="{txtBaseZoning}"/>-->
+										<mx:AdvancedDataGrid id="zoneBP"   width="100" dataProvider="{acBaseZoning}"  headerHeight="0" textAlign="left" rowCount="{acBaseZoning.length + 1}"/>
 									</mx:FormItem>
 									<mx:FormItem label="Specific Plan:">
 										<mx:Text id="zoneSP" width="100" text="{txtSpecificZone}"/>
