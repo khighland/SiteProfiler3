@@ -40,10 +40,7 @@
 			protected function tokenloaded(event:Event):void
 			{
 				myTok = tokengetter.appT;
-				//Drews Machines token
 				//myTok = "oK9ysUo1nac5mYegiUU9BcEtaEZksFqNJuRW8g-BqYrN5RG5G3F1_B8qEVq0_smJv3MNuDEra9AG3DnsR4WWVg..";
-				//kevins machines token
-				//myTok ="Ja6OSqpLPN-CyqDBcdSuvd9tWTP7TgnFcRT7VUhr4w6Z8fJujwp20nGRGhOizR0rId2UqMtt66RouKrMz5HDNQ..";
 				createDeferredContent();
 				
 			}
