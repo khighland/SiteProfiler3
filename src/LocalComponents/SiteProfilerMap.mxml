@@ -34,20 +34,23 @@
 			import com.esri.ags.layers.supportClasses.AllDetails;
 			import com.esri.ags.layers.supportClasses.LayerInfo;
 			import com.esri.ags.layers.supportClasses.Relationship;
+			import com.esri.ags.portal.PopUpRenderer;
+			import com.esri.ags.portal.supportClasses.PopUpFieldInfo;
+			import com.esri.ags.portal.supportClasses.PopUpInfo;
 			import com.esri.ags.tasks.supportClasses.AddressCandidate;
+			import com.esri.ags.tasks.supportClasses.AddressToLocationsParameters;
 			import com.esri.ags.tasks.supportClasses.BufferParameters;
 			import com.esri.ags.tasks.supportClasses.IdentifyParameters;
 			import com.esri.ags.tasks.supportClasses.IdentifyResult;
+			import com.esri.ags.tasks.supportClasses.ProjectParameters;
 			import com.esri.ags.utils.WebMercatorUtil;
-			import com.esri.ags.webmap.PopUpRenderer;
-			import com.esri.ags.webmap.supportClasses.PopUpFieldInfo;
-			import com.esri.ags.webmap.supportClasses.PopUpInfo;
 			
 			import flash.filters.BitmapFilterQuality;
 			import flash.filters.BitmapFilterType;
 			import flash.net.SharedObject;
 			
 			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
 			import mx.collections.HierarchicalCollectionViewCursor;
 			import mx.collections.IViewCursor;
 			import mx.collections.ListCollectionView;
@@ -735,7 +738,11 @@
 			}
 		
 			var myOutFieldsAddress:Array = ["HouseNum","Prefix Dir", "FacilityID"];
-			AddressLocator.addressToLocations(addressObjectAddress,myOutFieldsAddress,new AsyncResponder(onGeoResult, onGeoFault));
+			var addparam:AddressToLocationsParameters = new AddressToLocationsParameters;
+			addparam.outFields = myOutFieldsAddress;
+			addparam.address = addressObjectAddress;
+			
+			AddressLocator.addressToLocations(addparam,new AsyncResponder(onGeoResult, onGeoFault));
 		}
 		
 		private function doSearchAPN(addr:String):void
@@ -746,7 +753,10 @@
 			}
 		
 			var myOutFields:Array = ["Match_addr"];
-			APNLocator.addressToLocations(addressObject,myOutFields,new AsyncResponder(onGeoResult, onGeoFault));
+			var addparam:AddressToLocationsParameters = new AddressToLocationsParameters;
+			addparam.outFields = myOutFields;
+			addparam.address = addressObject;
+			APNLocator.addressToLocations(addparam,new AsyncResponder(onGeoResult, onGeoFault));
 		}
 			private function doSearchIntersection(addr:String):void
 			{
@@ -755,8 +765,12 @@
 						Street: addr
 					}
 				var myOutFields:Array = ["*"];
+				var addparam:AddressToLocationsParameters = new AddressToLocationsParameters;
+				addparam.outFields = myOutFields;
+				addparam.address = addressObjectAddress;
+				
 				var intersectionLocator:Locator = new Locator("http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/GISSQL_Streets/GeocodeServer");
-				intersectionLocator.addressToLocations(addressObjectAddress,myOutFields,new AsyncResponder(onGeoResult, onGeoFault));
+				intersectionLocator.addressToLocations(addparam,new AsyncResponder(onGeoResult, onGeoFault));
 			}
 		
 		private function onGeoResult(candidates:Array, token:Object = null):void 
@@ -771,7 +785,10 @@
 				var coordGraphic:Graphic = new Graphic(point1,smsIdentify);
 				coordGraphic.geometry.spatialReference = new SpatialReference(2230)
 				var outSR:SpatialReference = new SpatialReference(102100);
-				geometry1.project([ point1 as Geometry],outSR);                        
+				var proParam:ProjectParameters = new ProjectParameters();
+				proParam.outSpatialReference = outSR;
+				proParam.geometries = [ point1 as Geometry]
+				geometry1.project(proParam);                
 				
 			}
 			else
@@ -1313,7 +1330,11 @@
 				glPermits.visible = false;
 				DistrictsService.visible=false;
 				glDistrictsServices.visible = false;
-				SiteProfileService.visibleLayers.removeAll();
+				if (SiteProfileService.visibleLayers)
+				{
+					SiteProfileService.visibleLayers.removeAll();
+				}
+				
 				
 				if 	(event.newIndex==0)
 				{
@@ -1385,7 +1406,7 @@
 				{
 					if ( layerInfo.subLayerIds.length > 0)
 					{
-						
+						var vislayers:ArrayList = new ArrayList ;
 						var sublayers:Array = layerInfo.subLayerIds;
 						for (var i:int = 0; i < sublayers.length; i++)
 						{
@@ -1395,17 +1416,25 @@
 							
 							if (DynamicService.layerInfos[sublayers[i]].defaultVisibility == true)
 							{
-								DynamicService.visibleLayers.addItem(sublayers[i]);
+								
+								vislayers.addItem(DynamicService.layerInfos[sublayers[i]].layerId);
+								//DynamicService.visibleLayers.addItem(sublayers[i]);
+								
 							}
 							else
 							{
-								var idIndex:int = DynamicService.visibleLayers.getItemIndex(sublayers[i]);
-								if (idIndex != -1)
+								if (DynamicService.visibleLayers)
 								{
-									DynamicService.visibleLayers.removeItemAt(idIndex); 
+									var idIndex:int = DynamicService.visibleLayers.getItemIndex(sublayers[i]);
+									if (idIndex != -1)
+									{
+										DynamicService.visibleLayers.removeItemAt(idIndex); 
+									}
 								}
+
 							}
-						} 
+						}
+						DynamicService.visibleLayers = vislayers;
 					}
 				}
 				 
@@ -1996,8 +2025,9 @@
 							  map="{map}" parentContainer="{spMain}" click="{tbb.selectedIndex = -1}"
 							  geometryServiceap="{geometry1}" slidingPanel="{spMain}" clipAndEnableScrolling="false"
 							  bottom="{parentApplication.bottom + 30}" x="{hbxAddress.width + tbb.width + 188 }"
-							  buttons="[btnGoogle, btnDraw, btnProject, btnGetElevation, btnProfileTool, btnGeoDocs, btnSSRS]"
-							  tocXML="http://ezoning.cityofencinitas.org/Configs/TOCWidget.xml"/>
+							  buttons="[btnGoogle, btnDraw, btnProject, btnGetElevation, btnProfileTool, btnGeoDocs, btnSSRS, btnPrint]"
+							  tocXML="http://ezoning.cityofencinitas.org/Configs/TOCWidget.xml"
+							  PrintXML="http://hyperion/SiteProfiler/configs/PrintWidget.xml"/>
 	
 
 
@@ -2535,10 +2565,11 @@
 												   visible="true" load="Addresses_loadHandler(event)" 
 												   imageFormat="png32" />-->
 				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer" 
-												   token="{myTok}"
+												   
 												   visible="true" load="Addresses_loadHandler(event)" 
-												   imageFormat="png32" />
-
+												   imageFormat="png32" 
+												   proxyURL="http://hyperion/Proxy/proxy.ashx"/>
+				<!--token="{myTok}"-->
 				<esri:GraphicsLayer id="glDistrictsServices" visible="true" />
 				<esri:GraphicsLayer id="glAddress" graphicProvider="{arrayAddresses}" visible="true"/>
 				<esri:GraphicsLayer id="glSubdivision" graphicProvider="{arraySubdivResult}" visible="false"/>

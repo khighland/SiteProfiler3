@@ -39,11 +39,13 @@
 			
 			protected function tokenloaded(event:Event):void
 			{
-				myTok = tokengetter.appT;
+				//myTok = tokengetter.appT;
 				//Drew's Token
-				//myTok = "oK9ysUo1nac5mYegiUU9BcEtaEZksFqNJuRW8g-BqYrN5RG5G3F1_B8qEVq0_smJv3MNuDEra9AG3DnsR4WWVg..";
+				myTok = "oK9ysUo1nac5mYegiUU9BcEtaEZksFqNJuRW8g-BqYrN5RG5G3F1_B8qEVq0_smJv3MNuDEra9AG3DnsR4WWVg..";
 				//Kevin's Token
 				//myTok = "KWxH1vKbBUxYzXhlZMCg4jNvSimEI_Qw2LIeqDCR4LPA70AOGIcza31ZTS2_iRyg1rJFJxk6k-BzZH-xLZ2oYg..";
+				//GISDev token
+				myTok = "togwUnv3YlJROkb_RMUVLhOnxD6vbyTde-3LO7k1rwrpU4G8KItOQGDCf6ZJO7Oz9fgW8kQeKi_YDySege2dMQ..";
 				createDeferredContent();
 				
 			}
