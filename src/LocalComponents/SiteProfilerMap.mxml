@@ -52,6 +52,7 @@
 			import mx.collections.ArrayCollection;
 			import mx.collections.ArrayList;
 			import mx.collections.HierarchicalCollectionViewCursor;
+			import mx.collections.IList;
 			import mx.collections.IViewCursor;
 			import mx.collections.ListCollectionView;
 			import mx.collections.Sort;
@@ -71,8 +72,6 @@
 			import spark.effects.animation.RepeatBehavior;
 			import spark.events.IndexChangeEvent;
 			
-			import EncComponents.TokenGrabber;
-			import EncComponents.TokenGrabberEvent;
 			import EncComponents.WebForm;
 			import EncComponents.helperClass;
 			import EncComponents.splashScreen;
@@ -1375,6 +1374,7 @@
 				else if 	(event.newIndex==5)
 				{
 					addLayer(getLayerInfoID(SiteProfileService.layerInfos,"Sewer"),SiteProfileService);
+					
 				}
 				else if 	(event.newIndex==6)
 				{
@@ -1398,45 +1398,37 @@
 			//takes a grouplayer layerInfo and turns on all sublayers that are on by default
 			private function addLayer(layerInfo:LayerInfo, DynamicService:ArcGISDynamicMapServiceLayer):void
 			{
-				//var visibleLayers:ArrayCollection;
-				//visibleLayers = SiteProfileService.visibleLayers;
-				//SiteProfileService.visibleLayers.addItem(layerInfo.id);
-				//SiteProfileService.visibleLayers.addItem(layerInfo.id);
+				var vislayers:ArrayList = new ArrayList;
 				if (layerInfo.subLayerIds)
 				{
 					if ( layerInfo.subLayerIds.length > 0)
 					{
-						var vislayers:ArrayList = new ArrayList ;
 						var sublayers:Array = layerInfo.subLayerIds;
 						for (var i:int = 0; i < sublayers.length; i++)
 						{
-							
-							trace (DynamicService.layerInfos[sublayers[i]].name);
-							trace (DynamicService.layerInfos[sublayers[i]].defaultVisibility);
-							
-							if (DynamicService.layerInfos[sublayers[i]].defaultVisibility == true)
+							var sublayerInfo:LayerInfo = DynamicService.layerInfos[sublayers[i]];
+							if (sublayerInfo.subLayerIds)
 							{
-								
-								vislayers.addItem(DynamicService.layerInfos[sublayers[i]].layerId);
-								//DynamicService.visibleLayers.addItem(sublayers[i]);
-								
-							}
-							else
-							{
-								if (DynamicService.visibleLayers)
+								for (var k:int = 0; k < sublayerInfo.subLayerIds.length; k++)
 								{
-									var idIndex:int = DynamicService.visibleLayers.getItemIndex(sublayers[i]);
-									if (idIndex != -1)
+									var subsublayerinfo:LayerInfo = DynamicService.layerInfos[sublayerInfo.subLayerIds[k]]
+									if(subsublayerinfo.defaultVisibility == true)
 									{
-										DynamicService.visibleLayers.removeItemAt(idIndex); 
+										vislayers.addItem(DynamicService.layerInfos[subsublayerinfo.layerId].layerId)
 									}
+									
 								}
-
+							}
+							else if (sublayerInfo.defaultVisibility == true)
+							{
+								vislayers.addItem(DynamicService.layerInfos[sublayerInfo.layerId].layerId);
 							}
 						}
-						DynamicService.visibleLayers = vislayers;
+
 					}
 				}
+				DynamicService.visibleLayers = vislayers;
+				DynamicService.refresh();
 				 
 				
 			}
@@ -1809,10 +1801,6 @@
 			
 			protected function fLayer_graphicAddHandler(event:GraphicEvent):void
 			{
-				
-				
-				
-				
 				event.graphic.addEventListener(MouseEvent.MOUSE_OVER, onMouseOverHandler);
 				event.graphic.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutHandler);
 			}
@@ -2556,16 +2544,12 @@
 						<esri:SpatialReference wkid="102100"/> 
 					</esri:Extent>
 				</esri:extent> -->
-				<esri:ArcGISTiledMapServiceLayer id="ShadedRelief"   url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/Shaded_Relief_2009/MapServer" visible="true" alpha="0"/>
-				<esri:ArcGISTiledMapServiceLayer id="Imagery"   url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/Imagery_2009_Web/MapServer" visible="true" alpha="1"/>
-				<esri:ArcGISTiledMapServiceLayer id="Basemap" url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/Basemap/MapServer" visible="true" />
-				<esri:ArcGISTiledMapServiceLayer id="BasemapPlus" url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/BasemapPlus/MapServer" visible="false" load="BasemapPlus_loadHandler(event)"/>
+				<esri:ArcGISTiledMapServiceLayer id="ShadedRelief"   url="http://hyperion:6080/arcgis/rest/services/Unsecured/Shaded_Relief_2009/MapServer" visible="true" alpha="0"/>
+				<esri:ArcGISTiledMapServiceLayer id="Imagery"   url="http://hyperion:6080/arcgis/rest/services/Unsecured/Imagery_2009_Web/MapServer" visible="true" alpha="1"/>
+				<esri:ArcGISTiledMapServiceLayer id="Basemap" url="http://hyperion:6080/arcgis/rest/services/Unsecured/Basemap/MapServer" visible="true" />
+				<esri:ArcGISTiledMapServiceLayer id="BasemapPlus" url="http://hyperion:6080/arcgis/rest/services/Unsecured/BasemapPlus/MapServer" visible="false" load="BasemapPlus_loadHandler(event)"/>
 				<esri:GraphicsLayer id="graphicsLayer" graphicProvider="{queryParcels.executeLastResult.features}" visible="true"/>
-<!--				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://gisweb:9231/internal/rest/services/Secured/SiteProfiler/MapServer" 
-												   visible="true" load="Addresses_loadHandler(event)" 
-												   imageFormat="png32" />-->
 				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer" 
-												   
 												   visible="true" load="Addresses_loadHandler(event)" 
 												   imageFormat="png32" 
 												   proxyURL="http://hyperion/Proxy/proxy.ashx"/>
