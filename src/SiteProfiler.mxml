@@ -41,11 +41,11 @@
 			{
 				//myTok = tokengetter.appT;
 				//Drew's Token
-				//myTok = "w4Ne5nGP2gepSIQd7A-b3T0FgE0bspLdfSnW5K5E0ywVr0lBmO8w8U-kUtO9YcKvi5q26s_m2zDYWj7a_IxoNg..";
+				//myTok = "6F4bPncp-HpJptee9agWh_uH1mbaeQAtEHcTM_fm-kAJ1yutcTA_wOADlCy35iJKJMsfL4wWXfKc_ps2bYUaJg..";
 				//Kevin's Token
 				//myTok = "KWxH1vKbBUxYzXhlZMCg4jNvSimEI_Qw2LIeqDCR4LPA70AOGIcza31ZTS2_iRyg1rJFJxk6k-BzZH-xLZ2oYg..";
 				//GISDev token
-				myTok = "togwUnv3YlJROkb_RMUVLhOnxD6vbyTde-3LO7k1rwrpU4G8KItOQGDCf6ZJO7Oz9fgW8kQeKi_YDySege2dMQ..";
+				myTok = "mOHFXwNhSa0gz6XqU86xcHI5sOfZq0BP5VY76TZqffhZ3E11eaokXz1xXD633UNL";
 				createDeferredContent();
 				
 			}
