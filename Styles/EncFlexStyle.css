@@ -161,6 +161,7 @@ s|ButtonBar
 
 esri|InfoWindow
 {
+	chromeColor: #9ba479;
 	border-thickness: 1;
 	borderColor: #666666;
 	background-color: #CAE3A3;
@@ -175,8 +176,16 @@ esri|InfoWindow
 	
 }
 
+esri|ContentNavigator
+{
+	headerBackgroundAlpha: 0;
+	headerColor:  #666666;
+}
+
 esri|PopUpRenderer
 {
 	chromeColor: #CAE3A3;
 	skinClass:ClassReference("skins.MyEncinitaspopupskin");
+	
 }
+

@@ -18,7 +18,10 @@
 		<![CDATA[
 			import com.esri.ags.FeatureSet;
 			import com.esri.ags.Graphic;
+			import com.esri.ags.Map;
 			import com.esri.ags.SpatialReference;
+			import com.esri.ags.components.ContentNavigator;
+			import com.esri.ags.components.supportClasses.InfoWindow;
 			import com.esri.ags.events.ExtentEvent;
 			import com.esri.ags.events.GeometryServiceEvent;
 			import com.esri.ags.events.GraphicEvent;
@@ -308,7 +311,7 @@
 				for (i=0;  i < myfileds.length; i++)
 				{
 					var field1:PopUpFieldInfo = new PopUpFieldInfo();
-					if (myfileds[i].toUpperCase() == 'ADDRESS' || myfileds[i].toUpperCase() == 'TRAILUSE' || myfileds[i].toUpperCase() == 'TRAILNUMBER' || myfileds[i].toUpperCase() == 'ISPRIVATE' || myfileds[i].toUpperCase() == 'SHAPE.LEN')
+					if (myfileds[i].toUpperCase() == 'ADDRESS' || myfileds[i].toUpperCase() == 'TRAILUSE' || myfileds[i].toUpperCase() == 'TRAILNUMBER' || myfileds[i].toUpperCase() == 'ISPRIVATE' || myfileds[i].toUpperCase() == 'TRAILLENGTH')
 					{
 						
 						field1.fieldName = myfileds[i];
@@ -349,8 +352,7 @@
 					else if (myfileds[i].toUpperCase() =='NAME')
 					{
 						
-						//popUpInfo.title = "{Name}";
-						popUpInfo.title = " ";
+						popUpInfo.title = "{Name} ";
 						
 					}
 				} 
@@ -404,32 +406,61 @@
 				var i:int;
 				var strName:String;
 
-				var myObj:PopUpRenderer = map.infoWindowContent as PopUpRenderer;
-				for (var atti:String in myObj.graphic.attributes)
+				var ifwc:Object = map.infoWindowContent;
+				map.infoWindow.labelVisible = false;
+				
+				var  myCN:ContentNavigator = map.infoWindowContent as ContentNavigator;
+				var myObj2:Graphic = myCN.selectedItem as Graphic;
+				for (var atti:String in myObj2.attributes)
 				{
+					var myhelper:helperClass = new helperClass;
 					if (atti.toUpperCase() =='NAME')
 					{
-						var myhelper:helperClass = new helperClass;
-						strName = myhelper.getDomainValue(atti, myObj.graphic.attributes[atti],myObj.graphic.graphicsLayer as FeatureLayer);
+						
+						strName = myhelper.getDomainValue(atti, myObj2.attributes[atti],myObj2.graphicsLayer as FeatureLayer);
 						if (strName == "")
 						{
-							strName = myObj.graphic.attributes[atti];
+							strName = myObj2.attributes[atti];
 						}
 					}
 					if (atti.toUpperCase() =='STATIONNUMBER')
 					{
-						strName = myhelper.getDomainValue(atti, myObj.graphic.attributes[atti],myObj.graphic.graphicsLayer as FeatureLayer);
+						strName = myhelper.getDomainValue(atti, myObj2.attributes[atti],myObj2.graphicsLayer as FeatureLayer);
 						if (strName == "")
 						{
-							strName = myObj.graphic.attributes[atti];
+							strName = myObj2.attributes[atti];
 						}
 					}
 				}
+				myCN.labelText = strName;
 				
-				if (strName != "")
-				{
-					myObj.popUpInfo.title = strName;
-				}
+				
+//				var myObj:PopUpRenderer = map.infoWindowContent as PopUpRenderer;
+//				for (var atti:String in myObj.graphic.attributes)
+//				{
+//					if (atti.toUpperCase() =='NAME')
+//					{
+//						var myhelper:helperClass = new helperClass;
+//						strName = myhelper.getDomainValue(atti, myObj.graphic.attributes[atti],myObj.graphic.graphicsLayer as FeatureLayer);
+//						if (strName == "")
+//						{
+//							strName = myObj.graphic.attributes[atti];
+//						}
+//					}
+//					if (atti.toUpperCase() =='STATIONNUMBER')
+//					{
+//						strName = myhelper.getDomainValue(atti, myObj.graphic.attributes[atti],myObj.graphic.graphicsLayer as FeatureLayer);
+//						if (strName == "")
+//						{
+//							strName = myObj.graphic.attributes[atti];
+//						}
+//					}
+//				}
+//				
+//				if (strName != "")
+//				{
+//					myObj.popUpInfo.title = strName;
+//				}
 				
 				map.infoWindow.show(map.toMapFromStage(event.stageX, event.stageY)); 
 				
