@@ -21,7 +21,6 @@
 			import com.esri.ags.Map;
 			import com.esri.ags.SpatialReference;
 			import com.esri.ags.components.ContentNavigator;
-			import com.esri.ags.components.supportClasses.InfoWindow;
 			import com.esri.ags.events.ExtentEvent;
 			import com.esri.ags.events.GeometryServiceEvent;
 			import com.esri.ags.events.GraphicEvent;
@@ -55,7 +54,6 @@
 			import mx.collections.ArrayCollection;
 			import mx.collections.ArrayList;
 			import mx.collections.HierarchicalCollectionViewCursor;
-			import mx.collections.IList;
 			import mx.collections.IViewCursor;
 			import mx.collections.ListCollectionView;
 			import mx.collections.Sort;
@@ -352,7 +350,7 @@
 					else if (myfileds[i].toUpperCase() =='NAME')
 					{
 						
-						popUpInfo.title = "{Name} ";
+						popUpInfo.title = "{Name}";
 						
 					}
 				} 
@@ -2049,9 +2047,6 @@
 							  PrintXML="http://hyperion/SiteProfiler/configs/PrintWidget.xml"/>
 	
 
-
-		
-	
 	<EncComponents:SlidingPanel id="spMain" anchor="Left" 
 								width="485"
 								y="{basmapControl1.y}"  
