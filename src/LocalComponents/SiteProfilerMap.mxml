@@ -1899,8 +1899,9 @@
 			<esri:SimpleLineSymbol color="0x66CCCC" width="3" alpha="1" style="solid" />
 		</esri:SimpleMarkerSymbol>
 		
-		<esri:SimpleFillSymbol  id="fillSymbol" color="0xFF0033" alpha="0.25" style="null">
-			<esri:SimpleLineSymbol color="0x6600FF" width="4" alpha="1" style="dashdotdot" />
+		<esri:SimpleFillSymbol  id="fillSymbol" color="0xFF0033" alpha="0.15" style="null">
+			<!--<esri:SimpleLineSymbol color="0x6600FF" width="10" alpha="1"  style="dashdot" />-->
+			<esri:CartographicLineSymbol id="cls2" color="0x6600FF" width="6" alpha="1" style="solid" cap="square" join="miter" /> 
 		</esri:SimpleFillSymbol>
 
 		<esri:SimpleFillSymbol id="symTransparent" alpha="0" color="0x00000000">
