@@ -186,6 +186,8 @@
 			[Bindable]
 			private var acBaseZoning:ArrayCollection = new ArrayCollection;
 			[Bindable]
+			private var txtCDPRequirement:String = "No";
+			[Bindable]
 			private var myParcelCursor:IViewCursor;
 			
 			[Bindable]
@@ -699,6 +701,7 @@
 					}
 					if (!spMain.IsOpen)
 					{
+						map.
 						spMain.open()
 					}
 				}
@@ -862,7 +865,9 @@
 				currentPoint = pt;
 				clearSelected();
 				mpIDPoint = pt;
+				
 				doQuery(pt);
+				
 				if (spMain.IsOpen)
 				{
 					map.centerAt(pt);
@@ -874,8 +879,10 @@
 				else
 				{
 					map.centerAt(pt);
+					map.zoomTo(pt);
 					map.scale = 1128.497176;
 				}
+				
 	
 	
 	        	
@@ -1005,6 +1012,10 @@
 					{
 						//txtGPZone = result.feature.attributes.GPDesignation;
 						acGPZone.addItem({"GP Designation": result.feature.attributes.GPDesignation});
+					}
+					else if (result.layerName == "CDP 10% Requirement Area")
+					{
+							txtCDPRequirement = "Yes";
 					}
  					else if (result.layerName == "Permit Areas")
 					{
@@ -1643,6 +1654,7 @@
 				arrcSubdiv.removeAll();
 				acGPZone.removeAll();
 				acBaseZoning.removeAll();
+				txtCDPRequirement = "No"
 			}
 
 
@@ -2493,7 +2505,10 @@
 									<mx:FormItem label="Specific Plan:">
 										<mx:Text id="zoneSP" width="100" text="{txtSpecificZone}"/>
 									</mx:FormItem>
-									<s:VGroup   verticalAlign="middle" width="90%" horizontalAlign="center">
+									<mx:FormItem label="CDP 10% Requirement Area:">
+										<mx:Text id="zoneCDP" width="100" text="{txtCDPRequirement}"/>
+									</mx:FormItem>
+									<s:VGroup   verticalAlign="bottom" width="90%" horizontalAlign="center">
 										<s:Button id="btnZoningDetails" label="For more detailed information, click here" click="btnZoningDetails_clickHandler(event)"/>
 									</s:VGroup>
 								</mx:Form>
