@@ -27,6 +27,7 @@
 			import com.esri.ags.events.LayerEvent;
 			import com.esri.ags.events.MapMouseEvent;
 			import com.esri.ags.events.QueryEvent;
+			import com.esri.ags.events.ZoomEvent;
 			import com.esri.ags.geometry.Extent;
 			import com.esri.ags.geometry.Geometry;
 			import com.esri.ags.geometry.MapPoint;
@@ -701,8 +702,7 @@
 					}
 					if (!spMain.IsOpen)
 					{
-						map.
-						spMain.open()
+						spMain.open();
 					}
 				}
 				//create a cursor so we can page through the returned parcels in a form
@@ -864,9 +864,9 @@
 				var pt:MapPoint = (event.result as Array)[0]as MapPoint;
 				currentPoint = pt;
 				clearSelected();
-				mpIDPoint = pt;
+				mpIDPoint = pt;	
 				
-				doQuery(pt);
+				
 				
 				if (spMain.IsOpen)
 				{
@@ -875,18 +875,29 @@
 					var screenpt:Point = map.toScreen(map.extent.center);
 					screenpt.x = screenpt.x + (map.width * .75);
 					pt = map.toMap(screenpt);
+					doQuery(mpIDPoint);
 				}
 				else
 				{
 					map.centerAt(pt);
 					map.zoomTo(pt);
 					map.scale = 1128.497176;
+					//The do query results in the sliding panel opening automatically which interfers with
+					//zooming to the geocoded parcel. To get around this we add an event listener that waits for the end of the
+					//zooming event. The doquery is then called from this fuction, which ensures the map has finished zooming to the 
+					//parcel first
+					map.addEventListener(ZoomEvent.ZOOM_END,onZoomEnd);
 				}
-				
+				//doQuery(mpIDPoint);
 	
 	
 	        	
 	        }
+			private function onZoomEnd(event:ZoomEvent):void
+			{
+				map.removeEventListener(ZoomEvent.ZOOM_END,onZoomEnd);
+				doQuery(mpIDPoint);
+			}
 	
 	        private function onProjectFault(info:Object, token:Object = null):void
 	        {
