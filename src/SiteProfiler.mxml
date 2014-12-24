@@ -39,11 +39,11 @@
 			
 			protected function tokenloaded(event:Event):void
 			{
-				//myTok = tokengetter.appT;
+				myTok = tokengetter.appT;
 				//Drew's Token
-				myTok = "6F4bPncp-HpJptee9agWh_uH1mbaeQAtEHcTM_fm-kAJ1yutcTA_wOADlCy35iJKJMsfL4wWXfKc_ps2bYUaJg..";
+				//myTok = "6F4bPncp-HpJptee9agWh_uH1mbaeQAtEHcTM_fm-kAJ1yutcTA_wOADlCy35iJKJMsfL4wWXfKc_ps2bYUaJg..";
 				//Kevin's Token
-				//myTok = "KWxH1vKbBUxYzXhlZMCg4jNvSimEI_Qw2LIeqDCR4LPA70AOGIcza31ZTS2_iRyg1rJFJxk6k-BzZH-xLZ2oYg..";
+				//myTok = "KWxH1vKbBUxYzXhlZMCg4nckIYeWyjJekEv75_6aoeBCA9EeFW1sak1KQUYyquU9WD7FS-bxrh_2Q8HEVzw-lA..";
 				//GISDev token
 				//myTok = "mOHFXwNhSa0gz6XqU86xcHI5sOfZq0BP5VY76TZqffhZ3E11eaokXz1xXD633UNL";
 				createDeferredContent();
