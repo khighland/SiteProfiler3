@@ -41,7 +41,7 @@
 			{
 				myTok = tokengetter.appT;
 				//Drew's Token
-				//myTok = "6F4bPncp-HpJptee9agWh_uH1mbaeQAtEHcTM_fm-kAJ1yutcTA_wOADlCy35iJKJMsfL4wWXfKc_ps2bYUaJg..";
+				myTok = "6F4bPncp-HpJptee9agWh_uH1mbaeQAtEHcTM_fm-kAJ1yutcTA_wOADlCy35iJKJMsfL4wWXfKc_ps2bYUaJg..";
 				//Kevin's Token
 				//myTok = "KWxH1vKbBUxYzXhlZMCg4nckIYeWyjJekEv75_6aoeBCA9EeFW1sak1KQUYyquU9WD7FS-bxrh_2Q8HEVzw-lA..";
 				//GISDev token
