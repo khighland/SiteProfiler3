@@ -676,11 +676,11 @@
 								}
 								case "AbsenteeFlag":
 								{
-									if (obj[fld] == "Yes")
+									if (obj[fld] == "True")
 									{
 										VO.AbsenteeFlag="No"
 									}
-									else if (obj[fld] == "No")
+									else if (obj[fld] == "False")
 									{
 										VO.AbsenteeFlag="Yes"
 									}
