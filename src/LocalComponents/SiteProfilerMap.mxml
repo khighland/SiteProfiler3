@@ -171,8 +171,6 @@
 			[Bindable]
 			private var arrWaterMeters:ArrayCollection = new ArrayCollection;
 			[Bindable]
-			private var arrSewerReimburse:ArrayCollection = new ArrayCollection;
-			[Bindable]
 			private var txtWaterCycle:String;
 			[Bindable]
 			private var txtWaterRecycled:String;
@@ -375,30 +373,28 @@
 
 	private function navitemClickHandler(event:IndexChangeEvent):void
 	{
-		if (event.newIndex > -1){
-			switch (event.target.dataProvider[event.newIndex].data)
-			{                    
-				case "Zoom In":                    
-				{
-					navToolbar.activate(NavigationTool.ZOOM_IN);                       
-					break;                    
-				}
-				case "Zoom Out":                    
-				{
-					navToolbar.activate(NavigationTool.ZOOM_OUT);                        
-					break;                    
-				}
-				case "Identify":
-				{
-					navToolbar.deactivate();
-					//map.addEventListener(MapMouseEvent.MAP_CLICK,onMapClicked);
-					map.panEnabled=true;
-					map.openHandCursorVisible=false;
-					//tbb.selectedIndex = -1
-					break;
-				}
-			}
-		}
+ 		switch (event.target.dataProvider[event.newIndex].data)
+		{                    
+			case "Zoom In":                    
+			{                        
+				navToolbar.activate(NavigationTool.ZOOM_IN);                       
+				break;                    
+			}                    
+			case "Zoom Out":                    
+			{                        
+				navToolbar.activate(NavigationTool.ZOOM_OUT);                        
+				break;                    
+			}                    
+			case "Identify":
+			{
+				navToolbar.deactivate();
+				//map.addEventListener(MapMouseEvent.MAP_CLICK,onMapClicked);
+				map.panEnabled=true;
+				map.openHandCursorVisible=false;
+				//tbb.selectedIndex = -1
+				break;
+			}                
+		}             
 	}
 	
 
@@ -1043,7 +1039,6 @@
 					else if (result.layerName == "Sewer Reimbursement District")
 					{
 						txtSewerReimbursement = result.feature.attributes.REIMBURSMENTNAME;
-						arrSewerReimburse.addItem({REIMBURSMENTNAME: result.feature.attributes.REIMBURSMENTNAME});
 					}
 					else if (result.layerName == "Sewer Discharge Permit")
 					{
@@ -1650,7 +1645,6 @@
 				txtSheriffKnox = "No"
 				txtFirePrePlan = "NA";
 				arrWaterMeters.removeAll();
-				arrSewerReimburse.removeAll();
 				txtWaterDist = "";
 				txtWaterCycle = "";
 				txtWaterRecycled = "No";
@@ -2406,19 +2400,13 @@
 								</EncComponents:RowColorDataGrid>
 								
 								<mx:Form  width="100%" height="100%" backgroundColor="#DDDDDD" backgroundAlpha=".7" fontSize="13" borderStyle="solid"  borderColor="#D11B3D">
-									<mx:FormItem label="Sewer Division:">
+						<mx:FormItem label="Sewer Division:">
 										<mx:Text id="sewer" width="200" text="{txtSewerDist}"/>
 									</mx:FormItem>
 									
-									<s:FormItem label="Sewer Reimbursement District:">
-										<!--<mx:Text id="sewerRD" width="200" text="{txtSewerReimbursement}"/>-->
-									
-										<mx:AdvancedDataGrid width="100%" height="100%" dataProvider="{arrSewerReimburse}"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
-											<mx:columns>
-												<mx:AdvancedDataGridColumn dataField="REIMBURSMENTNAME" headerText="Reimbursement Dist." sortable="true" visible="true" />
-											</mx:columns>
-										</mx:AdvancedDataGrid>
-									</s:FormItem>
+									<mx:FormItem label="Sewer Reimbursement District:">
+										<mx:Text id="sewerRD" width="200" text="{txtSewerReimbursement}"/>
+									</mx:FormItem>
 								</mx:Form>
 							</s:VGroup>
 						</s:NavigatorContent>
