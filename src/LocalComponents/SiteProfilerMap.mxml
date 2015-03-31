@@ -477,69 +477,71 @@
 			//map.infoWindow.show(map.toMapFromStage(event.stageX, event.stageY));
 			handlePopUp(event);
 		}
-		
-		switch ( tbb.selectedItem.data)
-		{
-			case "Identify":
+		if (tbb.selectedItem != null){
+			switch ( tbb.selectedItem.data)
 			{
-				if (cursorManager.currentCursorID != _cursorID)
+				case "Identify":
 				{
-					//lblAddreesCount.text = "";
-					//lblBusinessCount.text = "";
-					currentPoint = event.mapPoint
-					clearSelected();
-					mpIDPoint = event.mapPoint
-					doQuery(event.mapPoint);
+					if (cursorManager.currentCursorID != _cursorID)
+					{
+						//lblAddreesCount.text = "";
+						//lblBusinessCount.text = "";
+						currentPoint = event.mapPoint
+						clearSelected();
+						mpIDPoint = event.mapPoint
+						doQuery(event.mapPoint);
+						break;
+					}
+					else
+					{
+						//map.infoWindow.show(map.toMapFromStage(event.stageX, event.stageY));
+						handlePopUp(event);
+						break;
+					}
+					
+				}
+				case "StreetView":
+				{
+					const frmapPoint:MapPoint = map.toMapFromStage(event.stageX, event.stageY);
+					var latlong:MapPoint;
+					var wkidString:String = frmapPoint.spatialReference.wkid.toString();
+					
+					if ( wkidString == "102100")
+					{
+						latlong = WebMercatorUtil.webMercatorToGeographic(frmapPoint) as MapPoint;
+						frLat = latlong.y.toFixed(6);
+						frLong = latlong.x.toFixed(6);
+						displayForm(frLat, frLong);
+					}
+					else if ( wkidString == "3857")
+					{
+						latlong = WebMercatorUtil.webMercatorToGeographic(frmapPoint) as MapPoint;
+						frLat = latlong.y.toFixed(6);
+						frLong = latlong.x.toFixed(6);
+						displayForm(frLat, frLong);
+					}
+					else if ( wkidString == "4326")
+					{
+						latlong = map.toMapFromStage(event.stageX, event.stageY);
+						frLat = latlong.y.toFixed(6);
+						frLong = latlong.x.toFixed(6);
+						displayForm(frLat, frLong);
+					}
+					
+					var graphic:Graphic = new Graphic();	
+					var mapPoint2:MapPoint = frmapPoint;
+					mapPoint2.spatialReference = map.spatialReference;				
+					graphic.geometry = mapPoint2;				
+					graphicsLayer.clear();				
+					graphicsLayer.add(graphic);
+				}
+				default:
+				{
 					break;
 				}
-				else
-				{
-					//map.infoWindow.show(map.toMapFromStage(event.stageX, event.stageY));
-					handlePopUp(event);
-					break;
-				}
-				
-			}
-			case "StreetView":
-			{
-				const frmapPoint:MapPoint = map.toMapFromStage(event.stageX, event.stageY);
-				var latlong:MapPoint;
-				var wkidString:String = frmapPoint.spatialReference.wkid.toString();
-				
-				if ( wkidString == "102100")
-				{
-					latlong = WebMercatorUtil.webMercatorToGeographic(frmapPoint) as MapPoint;
-					frLat = latlong.y.toFixed(6);
-					frLong = latlong.x.toFixed(6);
-					displayForm(frLat, frLong);
-				}
-				else if ( wkidString == "3857")
-				{
-					latlong = WebMercatorUtil.webMercatorToGeographic(frmapPoint) as MapPoint;
-					frLat = latlong.y.toFixed(6);
-					frLong = latlong.x.toFixed(6);
-					displayForm(frLat, frLong);
-				}
-				else if ( wkidString == "4326")
-				{
-					latlong = map.toMapFromStage(event.stageX, event.stageY);
-					frLat = latlong.y.toFixed(6);
-					frLong = latlong.x.toFixed(6);
-					displayForm(frLat, frLong);
-				}
-				
-				var graphic:Graphic = new Graphic();	
-				var mapPoint2:MapPoint = frmapPoint;
-				mapPoint2.spatialReference = map.spatialReference;				
-				graphic.geometry = mapPoint2;				
-				graphicsLayer.clear();				
-				graphicsLayer.add(graphic);
-			}
-			default:
-			{
-				break;
 			}
 		}
+		
 	}
 			
 	public function displayForm(lat:String,long:String):void
@@ -2024,7 +2026,8 @@
 		<esri:QueryTask id="BMPQuery" url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer/" 
 						token="{myTok}"
 						showBusyCursor="true" useAMF="true" />
-		<esri:QueryTask id="SubdivisionQuery" url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer/" 
+		<esri:QueryTask id="SubdivisionQuery" url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer/"
+						
 						token="{myTok}"
 						showBusyCursor="true" useAMF="true" />
 		
@@ -2616,9 +2619,10 @@
 				<esri:GraphicsLayer id="graphicsLayer" graphicProvider="{queryParcels.executeLastResult.features}" visible="true"/>
 				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer" 
 												   visible="true" load="Addresses_loadHandler(event)" 
-												   imageFormat="png32" 
-												   proxyURL="http://hyperion/Proxy/proxy.ashx"/>
-				<!--token="{myTok}"-->
+												   imageFormat="png32"
+												   proxyURL="http://hyperion/Proxy/proxy.ashx"
+												   />
+				<!--token="{myTok}" proxyURL="http://hyperion/Proxy/proxy.ashx"-->
 				<esri:GraphicsLayer id="glDistrictsServices" visible="true" />
 				<esri:GraphicsLayer id="glAddress" graphicProvider="{arrayAddresses}" visible="true"/>
 				<esri:GraphicsLayer id="glSubdivision" graphicProvider="{arraySubdivResult}" visible="false"/>
@@ -2627,7 +2631,7 @@
 												   visible="false" 
 												   imageFormat="png32"
 												   load="{DistrictsService_loadHandler(event)}">-->
-				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/MapServer" 
+				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://hyperion/encintgis/rest/services/Unsecured/DistrictsAndServices/MapServer" 
 												   visible="false" 
 												   imageFormat="png32"
 												   load="{DistrictsService_loadHandler(event)}">
