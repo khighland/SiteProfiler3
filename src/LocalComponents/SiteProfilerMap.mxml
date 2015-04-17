@@ -1856,7 +1856,7 @@
 
 			protected function btnLandRecsApp_clickHandler(event:MouseEvent):void
 			{
-				navigateToURL(new URLRequest( 'http://hyperion/LandRecords?X=' + mpIDPoint.x + '&Y=' + mpIDPoint.y + '&start=extent&xmin=' + map.extent.xmin + '&ymin=' + map.extent.ymin + '&xmax=' + map.extent.xmax + '&ymax=' + map.extent.ymax ),"quote");
+				navigateToURL(new URLRequest( 'https://hyperion.encinitasca.gov/LandRecords?X=' + mpIDPoint.x + '&Y=' + mpIDPoint.y + '&start=extent&xmin=' + map.extent.xmin + '&ymin=' + map.extent.ymin + '&xmax=' + map.extent.xmax + '&ymax=' + map.extent.ymax ),"quote");
 			}
 			
 			protected function fLayer_graphicAddHandler(event:GraphicEvent):void
