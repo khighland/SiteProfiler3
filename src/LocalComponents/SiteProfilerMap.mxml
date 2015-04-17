@@ -1966,8 +1966,8 @@
 		
 		
 		<esri:IdentifyTask id="SiteProfiler_Identify" 
-						   url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer"
-						   token="{myTok}"
+						   url="https://hyperion.encinitasca.gov/hypegis/rest/services/Secured/SiteProfiler/MapServer"
+						   proxyURL="https://hyperion.encinitasca.gov/Proxy/Proxy.ashx"
 						   concurrency="last"
 						   showBusyCursor="true" />
 		
@@ -1980,19 +1980,21 @@
 							  concurrency="last"
 							  projectComplete="onProjectComplete(event)"
 							  fault="onProjectFault(event)"
-							  url="http://coemapservices.encinitasca.gov/encgis/rest/services/Utilities/Geometry/GeometryServer"/>
+							  url="https://hyperion.encinitasca.gov/hypegis/rest/services/Utilities/Geometry/GeometryServer"/>
 		
 		<esri:QueryTask id="queryParcels"
 						showBusyCursor="true"						
-						url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/BasemapPlus/MapServer"
+						url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/BasemapPlus/MapServer"
 						executeComplete="onQueryParcelComplete(event)" 
+						fault="onZoningFault(event, event.toString())"
 						useAMF="true">		
 		</esri:QueryTask>
 		
 		<esri:QueryTask id="queryAddressesTask"
 						showBusyCursor="true"
-						url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer/"
-						token="{myTok}"
+						url="https://hyperion.encinitasca.gov/hypegis/rest/services/Secured/SiteProfiler/MapServer/"
+						proxyURL="https://hyperion.encinitasca.gov/Proxy/Proxy.ashx"
+						
 						useAMF="true">
 		</esri:QueryTask>
 		
@@ -2023,12 +2025,12 @@
 		
 
 		
-		<esri:QueryTask id="BMPQuery" url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer/" 
-						token="{myTok}"
+		<esri:QueryTask id="BMPQuery" url="https://hyperion.encinitasca.gov/hypegis/rest/services/Secured/SiteProfiler/MapServer/" 
+						proxyURL="https://hyperion.encinitasca.gov/Proxy/Proxy.ashx"
 						showBusyCursor="true" useAMF="true" />
-		<esri:QueryTask id="SubdivisionQuery" url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer/"
+		<esri:QueryTask id="SubdivisionQuery" url="https://hyperion.encinitasca.gov/hypegis/rest/services/Secured/SiteProfiler/MapServer/"
 						
-						token="{myTok}"
+						proxyURL="https://hyperion.encinitasca.gov/Proxy/Proxy.ashx"
 						showBusyCursor="true" useAMF="true" />
 		
 		<esri:RelationshipQuery id="relatedBusinesses"
@@ -2615,12 +2617,12 @@
 				<esri:ArcGISTiledMapServiceLayer id="ShadedRelief"   url="http://hyperion:6080/arcgis/rest/services/Unsecured/Shaded_Relief_2009/MapServer" visible="true" alpha="0"/>
 				<esri:ArcGISTiledMapServiceLayer id="Imagery"   url="http://hyperion:6080/arcgis/rest/services/Unsecured/Imagery_2009_Web/MapServer" visible="true" alpha="1"/>
 				<esri:ArcGISTiledMapServiceLayer id="Basemap" url="http://hyperion:6080/arcgis/rest/services/Unsecured/Basemap/MapServer" visible="true" />
-				<esri:ArcGISTiledMapServiceLayer id="BasemapPlus" url="http://hyperion:6080/arcgis/rest/services/Unsecured/BasemapPlus/MapServer" visible="false" load="BasemapPlus_loadHandler(event)"/>
+				<esri:ArcGISTiledMapServiceLayer id="BasemapPlus" url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/BasemapPlus/MapServer" visible="false" load="BasemapPlus_loadHandler(event)"/>
 				<esri:GraphicsLayer id="graphicsLayer" graphicProvider="{queryParcels.executeLastResult.features}" visible="true"/>
-				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="http://hyperion:6080/arcgis/rest/services/Secured/SiteProfiler/MapServer" 
+				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="https://hyperion.encinitasca.gov/hypegis/rest/services/Secured/SiteProfiler/MapServer" 
 												   visible="true" load="Addresses_loadHandler(event)" 
 												   imageFormat="png32"
-												   proxyURL="http://hyperion/Proxy/proxy.ashx"
+												   proxyURL="https://hyperion.encinitasca.gov/Proxy/Proxy.ashx"
 												   />
 				<!--token="{myTok}" proxyURL="http://hyperion/Proxy/proxy.ashx"-->
 				<esri:GraphicsLayer id="glDistrictsServices" visible="true" />
@@ -2631,7 +2633,7 @@
 												   visible="false" 
 												   imageFormat="png32"
 												   load="{DistrictsService_loadHandler(event)}">-->
-				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="http://hyperion/encintgis/rest/services/Unsecured/DistrictsAndServices/MapServer" 
+				<esri:ArcGISDynamicMapServiceLayer id="DistrictsService" url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/DistrictsAndServices/MapServer" 
 												   visible="false" 
 												   imageFormat="png32"
 												   load="{DistrictsService_loadHandler(event)}">
@@ -2643,7 +2645,7 @@
 								   visible="false"
 								   name="Parks"
 								   outFields="[Name,Address,GP_Subtype, URL]" load="FeatureLayer_loadHandler(event)"
-								   url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/5">
+								   url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/5">
 					
 				</esri:FeatureLayer>
 				<esri:FeatureLayer id="POIFL"
@@ -2652,7 +2654,7 @@
 								   visible="false"
 								   name="Points Of Interest"
 								   outFields="[Name,Location, URL]" load="FeatureLayer_loadHandler(event)"
-								   url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/1" >
+								   url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/1" >
 				</esri:FeatureLayer>
 				<esri:FeatureLayer id="PrivateSchoolFL"
 								   graphicAdd="fLayer_graphicAddHandler(event)"
@@ -2660,7 +2662,7 @@
 								   visible="false"
 								   name="Schools"
 								   outFields="[Name,Address,Subtype,IsPrivate, URL]" load="FeatureLayer_loadHandler(event)"
-								   url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/2">
+								   url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/2">
 				</esri:FeatureLayer>
 				<esri:FeatureLayer id="ChurchFL"
 								   graphicAdd="fLayer_graphicAddHandler(event)"
@@ -2668,7 +2670,7 @@
 								   visible="false"
 								   name="Churches"
 								   outFields="[Name,Address, URL]" load="FeatureLayer_loadHandler(event)"
-								   url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/3">
+								   url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/3">
 				</esri:FeatureLayer>
 				<esri:FeatureLayer id="TrailsFL"
 								   name="Trails"
@@ -2676,7 +2678,7 @@
 								   mode="snapshot"
 								   visible="false"
 								   outFields="[TrailNumber,TrailUse]" load="FeatureLayer_loadHandler(event)"
-								   url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/4">
+								   url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/4">
 				</esri:FeatureLayer>
 				<esri:FeatureLayer id="FireStation"
 								   name="Fire Station"
@@ -2684,7 +2686,7 @@
 								   mode="snapshot"
 								   visible="false"
 								   outFields="[StationNumber,Address]" load="FeatureLayer_loadHandler(event)"
-								   url="http://hyperion:6080/arcgis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/6">
+								   url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/DistrictsAndServices/FeatureServer/6">
 				</esri:FeatureLayer>
 			</esri:Map>
 		</s:Group>
