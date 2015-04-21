@@ -806,7 +806,7 @@
 				addparam.outFields = myOutFields;
 				addparam.address = addressObjectAddress;
 				
-				var intersectionLocator:Locator = new Locator("http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/GISSQL_Streets/GeocodeServer");
+				var intersectionLocator:Locator = new Locator("https://coemapservices.encinitasca.gov/hypegis/rest/services/Unsecured/GISSQL_Streets/GeocodeServer");
 				intersectionLocator.addressToLocations(addparam,new AsyncResponder(onGeoResult, onGeoFault));
 			}
 		
@@ -1918,10 +1918,10 @@
 		<esri:NavigationTool id="navToolbar" map="{map}"  />
 		
 		<esri:Locator id="AddressLocator"
-					  url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/GISSQL_Address/GeocodeServer"/>
+					  url="https://coemapservices.encinitasca.gov/hypegis/rest/services/Unsecured/GISSQL_Address/GeocodeServer"/>
 		
 		<esri:Locator id="APNLocator"
-					  url="http://coemapservices.encinitasca.gov/encgis/rest/services/Unsecured/GISSQL_APN/GeocodeServer"/>
+					  url="https://coemapservices.encinitasca.gov/hypegis/rest/services/Unsecured/GISSQL_APN/GeocodeServer"/>
 		
 		<!-- symbol to store geocode result so it can be reprojected -->
 		<esri:SimpleMarkerSymbol id="smsIdentify" style="diamond" color="0x00FF00" size="15"/>
@@ -2614,9 +2614,9 @@
 						<esri:SpatialReference wkid="102100"/> 
 					</esri:Extent>
 				</esri:extent> -->
-				<esri:ArcGISTiledMapServiceLayer id="ShadedRelief"   url="http://hyperion:6080/arcgis/rest/services/Unsecured/Shaded_Relief_2009/MapServer" visible="true" alpha="0"/>
-				<esri:ArcGISTiledMapServiceLayer id="Imagery"   url="http://hyperion:6080/arcgis/rest/services/Unsecured/Imagery_2009_Web/MapServer" visible="true" alpha="1"/>
-				<esri:ArcGISTiledMapServiceLayer id="Basemap" url="http://hyperion:6080/arcgis/rest/services/Unsecured/Basemap/MapServer" visible="true" />
+				<esri:ArcGISTiledMapServiceLayer id="ShadedRelief"   url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/Shaded_Relief_2009/MapServer" visible="true" alpha="0"/>
+				<esri:ArcGISTiledMapServiceLayer id="Imagery"   url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/Imagery_2009_Web/MapServer" visible="true" alpha="1"/>
+				<esri:ArcGISTiledMapServiceLayer id="Basemap" url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/Basemap/MapServer" visible="true" />
 				<esri:ArcGISTiledMapServiceLayer id="BasemapPlus" url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/BasemapPlus/MapServer" visible="false" load="BasemapPlus_loadHandler(event)"/>
 				<esri:GraphicsLayer id="graphicsLayer" graphicProvider="{queryParcels.executeLastResult.features}" visible="true"/>
 				<esri:ArcGISDynamicMapServiceLayer id="SiteProfileService" url="https://hyperion.encinitasca.gov/hypegis/rest/services/Secured/SiteProfiler/MapServer" 
