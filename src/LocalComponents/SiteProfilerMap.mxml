@@ -2079,7 +2079,7 @@
 							  bottom="{parentApplication.bottom + 30}" x="{hbxAddress.width + tbb.width + 188 }"
 							  buttons="[btnGoogle, btnDraw, btnProject, btnGetElevation, btnProfileTool, btnGeoDocs, btnSSRS, btnPrint]"
 							  tocXML="http://ezoning.cityofencinitas.org/Configs/TOCWidget.xml"
-							  PrintXML="http://hyperion/SiteProfiler/configs/PrintWidget.xml"/>
+							  PrintXML="https://hyperion.encinitasca.gov/SiteProfiler/configs/PrintWidget.xml"/>
 	
 
 	<EncComponents:SlidingPanel id="spMain" anchor="Left" 
