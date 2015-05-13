@@ -39,9 +39,9 @@
 			
 			protected function tokenloaded(event:Event):void
 			{
-				//myTok = tokengetter.appT;
+				myTok = tokengetter.appT;
 				//Drew's Token
-				myTok = "q4nhfQmSMSsBJBy66Qv69-UDAbvyzkInNJal4tkslTpcry9iKMXi5JKEmHYu0I3g";
+				//myTok = "q4nhfQmSMSsBJBy66Qv69-UDAbvyzkInNJal4tkslTpcry9iKMXi5JKEmHYu0I3g";
 				//Kevin's Token
 				//myTok = "KWxH1vKbBUxYzXhlZMCg4luOTPHbRwcGSm66KCk2buxvH2ADBZIHe_ck6fP4sWkA6R0kCvpFQo9h49VraV_h3w..";
 				//GISDev token
