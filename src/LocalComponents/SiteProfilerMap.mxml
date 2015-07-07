@@ -2624,7 +2624,7 @@
 												   imageFormat="png32"
 												   proxyURL="https://hyperion.encinitasca.gov/Proxy/Proxy.ashx"
 												   />
-				<!--token="{myTok}" proxyURL="http://hyperion/Proxy/proxy.ashx"-->
+				<!--token="{myTok}" proxyURL="https://hyperion.encinitasca.gov/Proxy/proxy.ashx"-->
 				<esri:GraphicsLayer id="glDistrictsServices" visible="true" />
 				<esri:GraphicsLayer id="glAddress" graphicProvider="{arrayAddresses}" visible="true"/>
 				<esri:GraphicsLayer id="glSubdivision" graphicProvider="{arraySubdivResult}" visible="false"/>

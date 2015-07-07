@@ -29,7 +29,7 @@
 * 
 * =============================================================================-->
 <configuration>
-	<elevationSOEURL>http://gisdev/ArcGIS/rest/services/Encinitas_Elevation/MapServer/exts/ElevationsSOE/ElevationLayers/0/GetElevations</elevationSOEURL>
+	<elevationSOEURL>https://coemapservices.encinitasca.gov/hypegis/rest/services/Encinitas_Elevation/MapServer/exts/ElevationsSOE/ElevationLayers/0/GetElevations</elevationSOEURL>
 	<elevationSOEURL.old>http://maps.esri.com/APL9/rest/services/Elevation/GlobalElevation/MapServer/exts/ElevationsSOE/ElevationLayers/0/GetElevations</elevationSOEURL.old>
 	<!-- Basic characteristics of the profile line in the chart -->
 	<profileLineWidth>2</profileLineWidth>
