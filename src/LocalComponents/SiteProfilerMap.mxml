@@ -2615,7 +2615,7 @@
 					</esri:Extent>
 				</esri:extent> -->
 				<esri:ArcGISTiledMapServiceLayer id="ShadedRelief"   url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/Shaded_Relief_2009/MapServer" visible="true" alpha="0"/>
-				<esri:ArcGISTiledMapServiceLayer id="Imagery"   url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/Imagery_2009_Web/MapServer" visible="true" alpha="1"/>
+				<esri:ArcGISTiledMapServiceLayer id="Imagery"   url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/Imagery_2014_Web/MapServer" visible="true" alpha="1"/>
 				<esri:ArcGISTiledMapServiceLayer id="Basemap" url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/Basemap/MapServer" visible="false" />
 				<esri:ArcGISTiledMapServiceLayer id="BasemapPlus" url="https://hyperion.encinitasca.gov/hypegis/rest/services/Unsecured/BasemapPlus/MapServer" visible="true" load="BasemapPlus_loadHandler(event)"/>
 				<esri:GraphicsLayer id="graphicsLayer" graphicProvider="{queryParcels.executeLastResult.features}" visible="true"/>
