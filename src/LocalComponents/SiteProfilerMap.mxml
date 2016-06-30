@@ -613,13 +613,13 @@
 						
 						if (lblAPN)
 						{
-							lblAPN.text = graphic.attributes['gispub.GIS.survey_TaxParcelFabric.APN']
+							lblAPN.text = graphic.attributes['APN']
 						}
 		
 						//dgZoning.dataProvider = graphic.attributes
 						var obj:Object = graphic.attributes;
 						var i:int
-						arrcAddressRelatedToPoints.addItem(graphic.attributes["gispub.GIS.hdl_TaxRec.SitusStreet"]);
+						arrcAddressRelatedToPoints.addItem(graphic.attributes["SitusStreet"]);
 
 						//Also store the parcels returned in an user defined data type to store its attritbutes in an esiily accessabe'
 						//way
@@ -2005,21 +2005,21 @@
 					outSpatialReference="{map.spatialReference}"
 					 >
 			<esri:outFields>
-				<fx:String>gispub.GIS.survey_TaxParcelFabric.APN</fx:String>
-				<fx:String>gispub.GIS.survey_TaxParcelFabric.ParcelID</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.OwnerName1</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.OwnerName2</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.SitusStreet</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.SitusCity</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.SitusState</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.SitusZip</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.MailToName</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.MailStreet</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.MailCity</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.MailZip</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.MailState</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.MailCountry</fx:String>
-				<fx:String>gispub.GIS.hdl_TaxRec.AbsenteeFlag</fx:String>
+				<fx:String>APN</fx:String>
+				<fx:String>ParcelID</fx:String>
+				<fx:String>OwnerName1</fx:String>
+				<fx:String>OwnerName2</fx:String>
+				<fx:String>SitusStreet</fx:String>
+				<fx:String>SitusCity</fx:String>
+				<fx:String>SitusState</fx:String>
+				<fx:String>SitusZip</fx:String>
+				<fx:String>MailToName</fx:String>
+				<fx:String>MailStreet</fx:String>
+				<fx:String>MailCity</fx:String>
+				<fx:String>MailZip</fx:String>
+				<fx:String>MailState</fx:String>
+				<fx:String>MailCountry</fx:String>
+				<fx:String>AbsenteeFlag</fx:String>
 			</esri:outFields>
 		</esri:Query>
 		
@@ -2331,7 +2331,7 @@
 							<s:VGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="10">
 								<mx:AdvancedDataGrid dataProvider="{arrcAddressRelatedToPoints}" width="100%" height="100"  horizontalScrollPolicy="auto" verticalScrollPolicy="auto" selectable="true">
 									<mx:columns>
-										<mx:AdvancedDataGridColumn dataField="gispub.GIS.hdl_TaxRec.SitusStreet" headerText="Site Address" sortable="true" visible="true" />
+										<mx:AdvancedDataGridColumn dataField="SitusStreet" headerText="Site Address" sortable="true" visible="true" />
 									</mx:columns>
 								</mx:AdvancedDataGrid>
 								
