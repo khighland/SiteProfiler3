@@ -2078,8 +2078,9 @@
 							  geometryServiceap="{geometry1}" slidingPanel="{spMain}" clipAndEnableScrolling="false"
 							  bottom="{parentApplication.bottom + 30}" x="{hbxAddress.width + tbb.width + 188 }"
 							  buttons="[btnGoogle, btnDraw, btnProject, btnGetElevation, btnProfileTool, btnGeoDocs, btnSSRS, btnPrint]"
-							  tocXML="http://ezoning.cityofencinitas.org/Configs/TOCWidget.xml"
-							  PrintXML="https://hyperion.encinitasca.gov/SiteProfiler/configs/PrintWidget.xml"/>
+							  tocXML="https://ezoning.cityofencinitas.org/Configs/TOCWidget.xml"
+							  PrintXML="https://hyperion.encinitasca.gov/SiteProfiler/configs/PrintWidget.xml"
+							  ElevationXML="https://myencinitas.encinitasca.gov/ElevationProfileWidget.xml"/>
 	
 
 	<EncComponents:SlidingPanel id="spMain" anchor="Left" 
